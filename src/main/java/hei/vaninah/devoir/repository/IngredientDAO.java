@@ -215,8 +215,6 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
         return ingredients;
     }
 
-
-
     public List<Ingredient> findByDishId(String dishId){
         List<Ingredient> ingredients = new ArrayList<>();
         String query = """
