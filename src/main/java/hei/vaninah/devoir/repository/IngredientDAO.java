@@ -12,15 +12,14 @@ import java.util.List;
 @Repository
 public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
     private final Connection connection;
-    private final PriceHistoryDAO priceHistoryRepository;
-    private final IngredientStockMovementDAO ingredientStockMovementRepository;
+    private final PriceHistoryDAO priceHistoryDAO;
+    private final IngredientStockMovementDAO ingredientStockMovementDAO;
 
-    public IngredientDAO(Connection connection, PriceHistoryDAO priceHistoryRepository, IngredientStockMovementDAO ingredientStockMovementRepository) {
+    public IngredientDAO(Connection connection, PriceHistoryDAO priceHistoryDAO, IngredientStockMovementDAO ingredientStockMovementDAO) {
         this.connection = connection;
-        this.priceHistoryRepository = priceHistoryRepository;
-        this.ingredientStockMovementRepository = ingredientStockMovementRepository;
+        this.priceHistoryDAO = priceHistoryDAO;
+        this.ingredientStockMovementDAO = ingredientStockMovementDAO;
     }
-
 
     @Override
     public Ingredient findById(String id) {
