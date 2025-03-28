@@ -6,7 +6,6 @@ import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.entity.Unit;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -151,90 +150,5 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
         return List.of();
     }
 
-    public List<Ingredient> findByCriteria(List<Criteria> criteria, Pagination pagination, Order order) {
-        List<Ingredient> ingredients = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT i.id, i.name, i.unit, i.unit_price, i.update_datetime FROM ingredient i WHERE 1=1");
-        List<Object> parameters = new ArrayList<>();
-        Timestamp updateDatetimeFrom = null;
-        Timestamp updateDatetimeEnd = null;
-        BigDecimal priceFrom = null;
-        BigDecimal priceTo = null;
 
-        for (Criteria c : criteria) {
-            if ("name".equals(c.getColumn())) {
-                query.append(" and i.").append(c.getColumn()).append(" ilike ?");
-                parameters.add("%" + c.getValue().toString() + "%");
-            } else if("unit_price_from".equals(c.getColumn())) {
-                priceFrom = (BigDecimal) c.getValue();
-            } else if("unit_price_to".equals(c.getColumn())) {
-                priceTo = (BigDecimal) c.getValue();
-            } else if ("update_datetime_from".equals(c.getColumn())) {
-                updateDatetimeFrom = (Timestamp) c.getValue();
-            }else if("update_datetime_end".equals(c.getColumn())) {
-                updateDatetimeEnd = (Timestamp) c.getValue();
-            } else if ("unit".equals(c.getColumn())) {
-                query.append(" and i.").append(c.getColumn()).append(" = ?");
-                parameters.add(c.getValue());
-            }
-        }
-
-        if(updateDatetimeFrom != null && updateDatetimeEnd != null) {
-            query.append(" and i.update_datetime between ? and ?");
-            parameters.add(updateDatetimeFrom);
-            parameters.add(updateDatetimeEnd);
-        }
-
-        if(priceFrom != null && priceTo != null) {
-            query.append(" and i.unit_price between ? and ?");
-            parameters.add(priceFrom);
-            parameters.add(priceTo);
-        }
-
-        query.append(" order by i.").append(order.getOrderBy()).append(" ").append(order.getOrderValue());
-        query.append(" limit ").append(pagination.getPageSize()).append(" offset ").append(
-                (pagination.getPage()  - 1) * pagination.getPageSize()
-        );
-
-        try {
-            PreparedStatement statement = connection.prepareStatement(query.toString());
-            for (int i = 0; i < parameters.size(); i++) {
-                Object value = parameters.get(i);
-                if(value.getClass().isEnum()){
-                    statement.setObject(i  + 1, value, Types.OTHER);
-                    continue;
-                }
-                statement.setObject(i + 1, value);
-            }
-            ResultSet rs = statement.executeQuery();
-            while(rs.next()){
-                ingredients.add(resultSetToIngredient(rs));
-            }
-        } catch (SQLException error) {
-            throw new RuntimeException(error.getMessage());
-        }
-        return ingredients;
-    }
-
-    public List<Ingredient> findByDishId(String dishId){
-        List<Ingredient> ingredients = new ArrayList<>();
-        String query = """
-            select "ingredient".*
-                from "dish_ingredient"
-                inner join "ingredient"
-                    on "ingredient"."id" = "dish_ingredient"."id_ingredient"
-                where "dish_ingredient"."id_dish" = ?
-                order by "ingredient"."name" asc;
-        """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, dishId);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                ingredients.add(resultSetToIngredient(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return ingredients;
-    }
 }

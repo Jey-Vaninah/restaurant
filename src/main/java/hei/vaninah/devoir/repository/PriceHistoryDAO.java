@@ -100,7 +100,6 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
         return List.of();
     }
 
-
     public List<PriceHistory> findByIngredientId(String id){
         List<PriceHistory> priceHistories = new ArrayList<>();
         String query = """

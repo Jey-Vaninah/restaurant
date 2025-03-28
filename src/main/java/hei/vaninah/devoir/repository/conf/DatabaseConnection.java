@@ -31,7 +31,7 @@ public class DatabaseConnection {
         }
         return connection;
     }
-    @Bean
+
     public void closeConnection() {
         if (connection == null) {
             return;

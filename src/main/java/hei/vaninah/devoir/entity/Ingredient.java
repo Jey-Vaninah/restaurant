@@ -78,4 +78,5 @@ public class Ingredient {
     public void setIngredientStockMovements(List<IngredientStockMovement> ingredientStockMovements) {
         this.ingredientStockMovements = ingredientStockMovements;
     }
+
 }
