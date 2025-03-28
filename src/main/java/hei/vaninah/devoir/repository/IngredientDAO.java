@@ -1,12 +1,26 @@
 package hei.vaninah.devoir.repository;
 
 import hei.vaninah.devoir.entity.Ingredient;
+import hei.vaninah.devoir.entity.IngredientStockMovement;
+import hei.vaninah.devoir.entity.PriceHistory;
+import hei.vaninah.devoir.entity.Unit;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
 import java.util.List;
 
 @Repository
 public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
+    private final Connection connection;
+    private final PriceHistoryDAO priceHistoryRepository;
+    private final IngredientStockMovementDAO ingredientStockMovementRepository;
+
+    public IngredientDAO(Connection connection, PriceHistoryDAO priceHistoryRepository, IngredientStockMovementDAO ingredientStockMovementRepository) {
+        this.connection = connection;
+        this.priceHistoryRepository = priceHistoryRepository;
+        this.ingredientStockMovementRepository = ingredientStockMovementRepository;
+    }
+
 
     @Override
     public Ingredient findById(String id) {
