@@ -14,4 +14,4 @@ create table if not exists "ingredient"
     "update_datetime" timestamp default current_timestamp not null,
     "unit_price" DECIMAL(10,2) check ("unit_price" > 0) not null,
     "unit" unit not null
-    );
+);

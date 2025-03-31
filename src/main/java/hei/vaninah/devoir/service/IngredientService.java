@@ -4,6 +4,7 @@ import hei.vaninah.devoir.entity.Ingredient;
 import hei.vaninah.devoir.repository.IngredientDAO;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,12 +13,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class IngredientService {
     private final IngredientDAO dao;
-
-    public IngredientService(IngredientDAO dao) {
-        this.dao = dao;
-    }
 
     public List<Ingredient> getIngredientsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pagination pagination, Order order) {
         List<Ingredient> allIngredients = dao.findAll(pagination ,order);

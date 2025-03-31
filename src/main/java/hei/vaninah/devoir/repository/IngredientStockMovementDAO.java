@@ -3,6 +3,7 @@ package hei.vaninah.devoir.repository;
 import hei.vaninah.devoir.entity.IngredientStockMovement;
 import hei.vaninah.devoir.entity.IngredientStockMovementType;
 import hei.vaninah.devoir.entity.Unit;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -10,12 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class IngredientStockMovementDAO implements RestaurantManagementDAO<IngredientStockMovement> {
     private final Connection connection;
-
-    public IngredientStockMovementDAO(Connection connection) {
-        this.connection = connection;
-    }
 
     private IngredientStockMovement resultSetToIngredientStock(ResultSet rs) throws SQLException {
         return new IngredientStockMovement(

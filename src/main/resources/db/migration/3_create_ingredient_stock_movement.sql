@@ -15,4 +15,4 @@ create table if not exists "ingredient_stock_movement"
     "movement_type" "ingredient_stock_movement_type" not null,
     "quantity" float check ("quantity" > 0) not null,
     "unit" unit not null
-    );
+);
