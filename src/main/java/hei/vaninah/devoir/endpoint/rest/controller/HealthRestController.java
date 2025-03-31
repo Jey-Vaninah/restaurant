@@ -1,4 +1,4 @@
-package hei.vaninah.devoir.controller;
+package hei.vaninah.devoir.endpoint.rest.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
