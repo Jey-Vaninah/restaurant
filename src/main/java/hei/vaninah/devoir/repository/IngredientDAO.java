@@ -143,7 +143,11 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
 
     @Override
     public List<Ingredient> saveAll(List<Ingredient> list) {
-        return List.of();
+        for(Ingredient ingredient : list) {
+            this.crupdate(ingredient);
+        }
+
+        return list;
     }
 
 

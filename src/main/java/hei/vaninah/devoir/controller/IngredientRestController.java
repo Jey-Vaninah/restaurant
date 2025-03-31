@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class IngredientController {
+public class IngredientRestController {
     private final IngredientService ingredientService;
 
     @GetMapping("/ingredients")
@@ -50,5 +50,11 @@ public class IngredientController {
     public ResponseEntity<List<Ingredient>> updateIngredients(@RequestBody List<Ingredient> ingredients) {
         List<Ingredient> updatedIngredients = ingredientService.updateIngredients(ingredients);
         return ResponseEntity.ok(updatedIngredients);
+    }
+
+    @DeleteMapping("/ingredients/{id}")
+    public ResponseEntity<Ingredient> deleteIngredient(@PathVariable String id) {
+        Ingredient deletedIngredient = ingredientService.deleteIngredient(id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(deletedIngredient);
     }
 }

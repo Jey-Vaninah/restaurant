@@ -40,4 +40,8 @@ public class IngredientService {
     public List<Ingredient> updateIngredients(List<Ingredient> ingredients) {
         return dao.saveAll(ingredients);
     }
+
+    public Ingredient deleteIngredient(String id) {
+        return dao.deleteById(id);
+    }
 }
