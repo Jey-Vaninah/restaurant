@@ -1,12 +1,5 @@
 package hei.vaninah.devoir.repository;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class Order {
     private String orderBy;
     private OrderValue orderValue;
@@ -14,5 +7,26 @@ public class Order {
     public enum OrderValue {
         DESC,
         ASC
+    }
+
+    public Order(String orderBy, OrderValue orderValue) {
+        this.orderBy = orderBy;
+        this.orderValue = orderValue;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public OrderValue getOrderValue() {
+        return orderValue;
+    }
+
+    public void setOrderValue(OrderValue orderValue) {
+        this.orderValue = orderValue;
     }
 }

@@ -4,7 +4,6 @@ import hei.vaninah.devoir.entity.Ingredient;
 import hei.vaninah.devoir.entity.IngredientStockMovement;
 import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.entity.Unit;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -12,11 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
 public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
     private final Connection connection;
     private final PriceHistoryDAO priceHistoryDAO;
     private final IngredientStockMovementDAO ingredientStockMovementDAO;
+
+    public IngredientDAO(Connection connection, PriceHistoryDAO priceHistoryDAO, IngredientStockMovementDAO ingredientStockMovementDAO) {
+        this.connection = connection;
+        this.priceHistoryDAO = priceHistoryDAO;
+        this.ingredientStockMovementDAO = ingredientStockMovementDAO;
+    }
 
     private Ingredient resultSetToIngredient(ResultSet rs) throws SQLException {
         String id = rs.getString("id");

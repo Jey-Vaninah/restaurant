@@ -6,6 +6,7 @@ import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
 import hei.vaninah.devoir.service.IngredientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 public class IngredientRestController {
     private final IngredientService ingredientService;
     private final IngredientMapper ingredientMapper;
+
+    public IngredientRestController(IngredientService ingredientService, IngredientMapper ingredientMapper) {
+        this.ingredientService = ingredientService;
+        this.ingredientMapper = ingredientMapper;
+    }
 
     @GetMapping("/ingredients")
     public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.model.Ingredient>> getIngredients(
