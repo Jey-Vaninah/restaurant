@@ -1,6 +1,7 @@
 package hei.vaninah.devoir.repository;
 
 import hei.vaninah.devoir.entity.PriceHistory;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -8,12 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@AllArgsConstructor
 public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
     final private Connection connection;
-
-    public PriceHistoryDAO(Connection connection) {
-        this.connection = connection;
-    }
 
     private PriceHistory resultSetToPriceHistory(ResultSet rs) throws SQLException {
         return new PriceHistory(
