@@ -102,7 +102,7 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
             PreparedStatement prs = connection.prepareStatement(query);
             prs.setString (1, toDelete.id());
             prs.executeUpdate();
-            retur n toDelete;
+            return toDelete;
         }catch (SQLException error){
             throw new RuntimeException(error);
         }
