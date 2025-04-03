@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Restaurant API
+  description: STD23042
+  version: '1.0.0'
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Ingredients
+    description: Operations related to ingredients
+  - name: Prices
+    description: Operations related to ingredient prices
+  - name: Stock Movements
+    description: Operations related to ingredient stock movements
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      operationId: ping
+      responses:
+        '200':
+          description: Pong response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
+  /ingredients:
+    get:
+      tags:
+        - Ingredients
+      summary: Get ingredients with optional price filters
+      operationId: getIngredients
+      parameters:
+        - name: priceMinFilter
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+        - name: priceMaxFilter
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: List of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+        '400':
+          description: Invalid price filter
+    post:
+      tags:
+        - Ingredients
+      summary: Add new ingredients
+      operationId: addIngredients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '201':
+          description: Ingredients created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+    put:
+      tags:
+        - Ingredients
+      summary: Update existing ingredients
+      operationId: updateIngredients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: Updated ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+
+  /ingredients/{ingredientId}:
+    get:
+      tags:
+        - Ingredients
+      summary: Get ingredient by ID
+      operationId: getIngredient
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found ingredient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '404':
+          description: Ingredient not found
+    delete:
+      tags:
+        - Ingredients
+      summary: Delete ingredient by ID
+      operationId: deleteIngredient
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Ingredient deleted
+        '404':
+          description: Ingredient not found
+
+  /ingredients/{ingredientId}/prices:
+    put:
+      tags:
+        - Prices
+      summary: Add or update prices for an ingredient
+      operationId: updateIngredientPrices
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceHistory'
+      responses:
+        '200':
+          description: Updated prices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceHistory'
+
+  /ingredients/{ingredientId}/stockMovements:
+    put:
+      tags:
+        - Stock Movements
+      summary: Add or update stock movements for an ingredient
+      operationId: updateIngredientStockMovements
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IngredientStockMovement'
+      responses:
+        '200':
+          description: Updated stock movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IngredientStockMovement'
+
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        updateDatetime:
+          type: string
+          format: date-time
+        unitPrice:
+          type: number
+          format: double
+        unit:
+          type: string
+        priceHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceHistory'
+        ingredientStockMovements:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientStockMovement'
+
+    PriceHistory:
+      type: object
+      properties:
+        id:
+          type: string
+        idIngredient:
+          type: string
+        priceDatetime:
+          type: string
+          format: date-time
+        unitPrice:
+          type: number
+          format: double
+
+    IngredientStockMovement:
+      type: object
+      properties:
+        id:
+          type: string
+        idIngredient:
+          type: string
+        quantity:
+          type: number
+          format: float
+        movementDatetime:
+          type: string
+          format: date-time
+        movementType:
+          type: string
+        unit:
+          type: string
