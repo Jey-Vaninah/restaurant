@@ -1,6 +1,6 @@
-package hei.vaninah.devoir.endpoint.rest.controller;
+package hei.vaninah.devoir.endpoint.controller;
 
-import hei.vaninah.devoir.endpoint.rest.mapper.IngredientMapper;
+import hei.vaninah.devoir.endpoint.mapper.IngredientMapper;
 import hei.vaninah.devoir.entity.Ingredient;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
@@ -21,7 +21,7 @@ public class IngredientRestController {
 
 
     @GetMapping("/ingredients")
-    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.model.Ingredient>> getIngredients(
+    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> getIngredients(
         @RequestParam(name = "priceMinFilter", required = false) BigDecimal priceMinFilter,
         @RequestParam(name = "priceMaxFilter", required = false) BigDecimal priceMaxFilter) {
 
@@ -37,14 +37,14 @@ public class IngredientRestController {
     }
 
     @GetMapping("/ingredients/{id}")
-    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.model.Ingredient> getIngredient(@PathVariable String id) {
+    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.Ingredient> getIngredient(@PathVariable String id) {
         return ingredientService.getIngredientById(id)
                 .map(ingredient -> ResponseEntity.ok(ingredientMapper.toRest(ingredient)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/ingredients")
-    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.model.Ingredient>> addIngredients(@RequestBody List<Ingredient> ingredients) {
+    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> addIngredients(@RequestBody List<Ingredient> ingredients) {
         List<Ingredient> savedIngredients = ingredientService.addIngredients(ingredients);
         return ResponseEntity.status(HttpStatus.CREATED).body(
             savedIngredients.stream().map(ingredientMapper::toRest).toList()
@@ -52,13 +52,13 @@ public class IngredientRestController {
     }
 
     @PutMapping("/ingredients")
-    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.model.Ingredient>> updateIngredients(@RequestBody List<Ingredient> ingredients) {
+    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> updateIngredients(@RequestBody List<Ingredient> ingredients) {
         List<Ingredient> updatedIngredients = ingredientService.updateIngredients(ingredients);
         return ResponseEntity.ok(updatedIngredients.stream().map(ingredientMapper::toRest).toList());
     }
 
     @DeleteMapping("/ingredients/{id}")
-    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.model.Ingredient> deleteIngredient(@PathVariable String id) {
+    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.Ingredient> deleteIngredient(@PathVariable String id) {
         Ingredient deletedIngredient = ingredientService.deleteIngredient(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(ingredientMapper.toRest(deletedIngredient));
     }

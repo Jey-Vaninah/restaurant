@@ -4,8 +4,6 @@ import hei.vaninah.devoir.entity.Ingredient;
 import hei.vaninah.devoir.repository.IngredientDAO;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

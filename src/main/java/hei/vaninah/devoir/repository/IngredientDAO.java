@@ -151,4 +151,26 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
     }
 
 
+    public List<Ingredient> findByDishId(String dishId){
+        List<Ingredient> ingredients = new ArrayList<>();
+        String query = """
+            select "ingredient".*
+                from "dish_ingredient"
+                inner join "ingredient"
+                    on "ingredient"."id" = "dish_ingredient"."id_ingredient"
+                where "dish_ingredient"."id_dish" = ?
+                order by "ingredient"."name" asc;
+        """;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, dishId);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                ingredients.add(resultSetToIngredient(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ingredients;
+    }
 }
