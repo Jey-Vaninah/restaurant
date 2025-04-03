@@ -1,6 +1,6 @@
-package hei.vaninah.devoir.endpoint.rest.mapper;
+package hei.vaninah.devoir.endpoint.mapper;
 
-import hei.vaninah.devoir.endpoint.rest.model.Ingredient;
+import hei.vaninah.devoir.endpoint.rest.Ingredient;
 import org.springframework.stereotype.Component;
 
 @Component

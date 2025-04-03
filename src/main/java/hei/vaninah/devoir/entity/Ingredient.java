@@ -20,5 +20,36 @@ public class Ingredient {
     private List<PriceHistory> priceHistories;
     private List<IngredientStockMovement> ingredientStockMovements;
 
+    public Float getAvailableQuantity(LocalDateTime datetime){
+        return this.ingredientStockMovements
+                .stream()
+                .filter(
+                        im -> im.movementDatetime().isBefore(datetime.plusSeconds(1))
+                )
+                .map(im -> {
+                    int multiply = im.movementType().equals(IngredientStockMovementType.IN) ? 1 : -1;
+                    return im.quantity() * multiply;
+                })
+                .reduce((float) 0, Float::sum);
+    }
 
+    public BigDecimal getCost(LocalDateTime datetime){
+        return this.priceHistories
+                .stream()
+                .filter(priceHistory -> priceHistory.getPriceDatetime().isBefore(datetime.plusSeconds(1)))
+                .sorted(
+                        (a, b) -> b.getPriceDatetime().compareTo(a.getPriceDatetime())
+                )
+                .map(PriceHistory::getUnitPrice)
+                .findFirst()
+                .orElse(this.getUnitPrice());
+    }
+
+    public BigDecimal getCost(){
+        return this.getCost(LocalDateTime.now());
+    }
+
+    public Float getAvailableQuantity(){
+        return this.getAvailableQuantity(LocalDateTime.now());
+    }
 }
