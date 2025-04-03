@@ -13,6 +13,10 @@ tags:
     description: Health check endpoints
   - name: Ingredients
     description: Operations related to ingredients
+  - name: Prices
+    description: Operations related to ingredient prices
+  - name: Stock Movements
+    description: Operations related to ingredient stock movements
 
 paths:
   /ping:
@@ -105,14 +109,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/Ingredient'
 
-  /ingredients/{id}:
+  /ingredients/{ingredientId}:
     get:
       tags:
         - Ingredients
       summary: Get ingredient by ID
       operationId: getIngredient
       parameters:
-        - name: id
+        - name: ingredientId
           in: path
           required: true
           schema:
@@ -132,18 +136,76 @@ paths:
       summary: Delete ingredient by ID
       operationId: deleteIngredient
       parameters:
-        - name: id
+        - name: ingredientId
           in: path
           required: true
           schema:
             type: string
       responses:
-        '201':
+        '204':
           description: Ingredient deleted
+        '404':
+          description: Ingredient not found
+
+  /ingredients/{ingredientId}/prices:
+    put:
+      tags:
+        - Prices
+      summary: Add or update prices for an ingredient
+      operationId: updateIngredientPrices
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceHistory'
+      responses:
+        '200':
+          description: Updated prices
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ingredient'
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceHistory'
+
+  /ingredients/{ingredientId}/stockMovements:
+    put:
+      tags:
+        - Stock Movements
+      summary: Add or update stock movements for an ingredient
+      operationId: updateIngredientStockMovements
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IngredientStockMovement'
+      responses:
+        '200':
+          description: Updated stock movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IngredientStockMovement'
 
 components:
   schemas:
@@ -160,5 +222,45 @@ components:
         unitPrice:
           type: number
           format: double
+        unit:
+          type: string
+        priceHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceHistory'
+        ingredientStockMovements:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientStockMovement'
+
+    PriceHistory:
+      type: object
+      properties:
+        id:
+          type: string
+        idIngredient:
+          type: string
+        priceDatetime:
+          type: string
+          format: date-time
+        unitPrice:
+          type: number
+          format: double
+
+    IngredientStockMovement:
+      type: object
+      properties:
+        id:
+          type: string
+        idIngredient:
+          type: string
+        quantity:
+          type: number
+          format: float
+        movementDatetime:
+          type: string
+          format: date-time
+        movementType:
+          type: string
         unit:
           type: string
