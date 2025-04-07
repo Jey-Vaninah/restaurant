@@ -3,6 +3,8 @@ package hei.vaninah.devoir.service;
 
 import hei.vaninah.devoir.entity.Dish;
 import hei.vaninah.devoir.repository.DishDAO;
+import hei.vaninah.devoir.repository.Order;
+import hei.vaninah.devoir.repository.Pagination;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,10 @@ import java.util.Optional;
 @Data
 public class DishService {
     private final DishDAO dao;
+
+    public List<Dish> getAll(){
+        return dao.findAll(new Pagination(1, 500), new Order("name", Order.OrderValue.ASC));
+    }
 
     public Optional<Dish> getDishById(String id) {
         return Optional.ofNullable(dao.findById(id));

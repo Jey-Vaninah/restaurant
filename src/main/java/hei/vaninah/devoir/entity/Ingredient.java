@@ -20,6 +20,7 @@ public class Ingredient {
     private List<PriceHistory> priceHistories;
     private List<IngredientStockMovement> ingredientStockMovements;
 
+
     public Float getAvailableQuantity(LocalDateTime datetime){
         return this.ingredientStockMovements
                 .stream()
@@ -51,5 +52,20 @@ public class Ingredient {
 
     public Float getAvailableQuantity(){
         return this.getAvailableQuantity(LocalDateTime.now());
+    }
+
+    public Float getCurrentStock(LocalDateTime datetime) {
+        return this.ingredientStockMovements
+                .stream()
+                .filter(ism -> ism.movementDatetime().isBefore(datetime.plusSeconds(1)))
+                .map(im -> {
+                    int multiply = im.movementType().equals(IngredientStockMovementType.IN) ? 1 : -1;
+                    return im.quantity() * multiply;
+                })
+                .reduce((float) 0, Float::sum);
+    }
+
+    public Float getCurrentStock(){
+        return this.getCurrentStock(LocalDateTime.now());
     }
 }

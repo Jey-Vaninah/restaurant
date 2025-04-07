@@ -12,5 +12,4 @@ public class DishIngredient {
     private String idIngredient;
     private Float requiredQuantity;
     private Unit unit;
-
 }

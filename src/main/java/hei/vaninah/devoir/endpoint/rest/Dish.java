@@ -4,14 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceHistory{
+public class Dish {
     private String id;
-    private LocalDateTime priceDatetime;
-    private BigDecimal unitPrice;
+    private String name;
+    private Integer availableQuantity;
+    private List<Ingredient> ingredients;
 }
+
+

@@ -14,8 +14,9 @@ import java.time.LocalDateTime;
 public class Ingredient {
     private String id;
     private String name;
-    private LocalDateTime updateDatetime;
     private BigDecimal unitPrice;
+    private LocalDateTime updateDatetime;
     private Unit unit;
-
+    private BigDecimal currentPrice;
+    private Float currentStock;
 }
