@@ -27,4 +27,8 @@ public class OrderService {
     public hei.vaninah.devoir.entity.Order deleteOrder(String id) {
         return dao.deleteById(id);
     }
+
+    public hei.vaninah.devoir.entity.Order findOrderByReference(String reference) {
+        return dao.findByReference(reference);
+    }
 }

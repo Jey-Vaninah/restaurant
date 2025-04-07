@@ -11,10 +11,11 @@ public class DishMapper {
 
     public Dish toRest(hei.vaninah.devoir.entity.Dish dish){
         return new Dish(
-             dish.getId(),
-             dish.getName(),
-             dish.getMaxPossibleDishes(),
-             dish.getIngredients().stream().map(ingredientMapper::toRest).toList()
+            dish.getId(),
+            dish.getName(),
+            dish.getMaxPossibleDishes(),
+            dish.getIngredients().stream().map(ingredientMapper::toRest).toList(),
+            dish.getUnitPrice()
         );
     }
 }

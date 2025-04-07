@@ -15,5 +15,4 @@ public class DishOrderStatus {
     private StatusHistory status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }
