@@ -1,6 +1,6 @@
 package hei.vaninah.devoir.endpoint.rest;
 
-import hei.vaninah.devoir.entity.DishOrderStatus;
+import hei.vaninah.devoir.entity.StatusHistory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DishOrder {
+public class CreateDishOrder {
     private String id;
-    private String orderId;
-    private Dish dish;
+    private String dishId;
     private int quantity;
-    private DishOrderStatus actualStatus;
+    private StatusHistory status;
 }
