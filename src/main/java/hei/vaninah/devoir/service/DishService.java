@@ -2,7 +2,9 @@ package hei.vaninah.devoir.service;
 
 
 import hei.vaninah.devoir.entity.Dish;
+import hei.vaninah.devoir.entity.DishIngredient;
 import hei.vaninah.devoir.repository.DishDAO;
+import hei.vaninah.devoir.repository.DishIngredientDAO;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
 import lombok.Data;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @Data
 public class DishService {
     private final DishDAO dao;
+    private final DishIngredientDAO dishIngredientDAO;
 
     public List<Dish> getAll(){
         return dao.findAll(new Pagination(1, 500), new Order("name", Order.OrderValue.ASC));
@@ -34,5 +37,10 @@ public class DishService {
 
     public Dish deleteDish(String id) {
         return dao.deleteById(id);
+    }
+
+    public Dish addDishIngredient(String id, List<DishIngredient> dishIngredients) {
+        dishIngredientDAO.saveAll(dishIngredients);
+        return dao.findById(id);
     }
 }

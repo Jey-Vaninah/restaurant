@@ -1,11 +1,12 @@
 package hei.vaninah.devoir.endpoint.controller;
 
+import hei.vaninah.devoir.endpoint.mapper.DishIngredientMapper;
 import hei.vaninah.devoir.endpoint.mapper.DishMapper;
+import hei.vaninah.devoir.endpoint.rest.DishIngredient;
 import hei.vaninah.devoir.endpoint.rest.Dish;
 import hei.vaninah.devoir.service.DishService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,9 +15,18 @@ import java.util.List;
 public class DishRestController {
     private DishService dishService;
     private DishMapper dishMapper;
+    private DishIngredientMapper dishIngredientMapper;
 
     @GetMapping("/dishes")
     public List<Dish> getDishes() {
         return dishService.getAll().stream().map(dishMapper::toRest).toList();
+    }
+
+    @PutMapping ( "/dishes/{id}/ingredients")
+    public Dish addIngredient(@PathVariable String id, @RequestBody  List<DishIngredient> ingredients) {
+        return dishMapper.toRest(dishService.addDishIngredient(
+            id,
+            ingredients.stream().map(ingredient -> dishIngredientMapper.toDomain(id, ingredient)).toList()
+        ));
     }
 }
