@@ -2,6 +2,7 @@ package hei.vaninah.devoir.repository;
 
 import hei.vaninah.devoir.entity.IngredientStockMovement;
 import hei.vaninah.devoir.entity.IngredientStockMovementType;
+import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.entity.Unit;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -50,7 +51,7 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
     @Override
     public IngredientStockMovement findById(String id) {
         String query = """
-            select * from ingredient_stock_movement where id = ?";
+            select * from ingredient_stock_movement where "id" = ?;
         """;
         try {
             PreparedStatement st = connection.prepareStatement(query);
@@ -69,12 +70,8 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
     public List<IngredientStockMovement> findAll(Pagination pagination, Order order) {
         List<IngredientStockMovement> stockMovements = new ArrayList<>();
         String query = """
-        
-                select * from "ingredient_stock_movement"
-        order by "movement_datetime" """ + order.getOrderValue() + """
-        limit ?
-                offset ?
-    """;
+            select * from "ingredient_stock_movement"
+            order by "movement_datetime" """ + order.getOrderValue() + "limit ? offset ?";
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -110,12 +107,10 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
 
     @Override
     public IngredientStockMovement save(IngredientStockMovement toCreate) {
-        String
-                query = """
-            insert into "ingredient_stock_movement"("id", "id_ingredient", "quantity", "movement_datetime", "mo
-                e", "unit")
+        String query = """
+           insert into "ingredient_stock_movement"("id", "id_ingredient", "quantity", "movement_datetime", "movement_type", "unit")
             values (?, ?, ?, ?, ?, ?);
-         """;
+        """;
         try{
             PreparedStatement prs = connection.prepareStatement(query);
             prs.setString (1, toCreate.id());
@@ -133,14 +128,12 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
 
     @Override
     public IngredientStockMovement update(IngredientStockMovement toUpdate) {
-        String query = """
-        update
-                "ingredient_stock_movement"
-        set "id_ingredient" = ?, "quantity" = ?, "movement_datetime" = ?, "movemen
-                e" = ?,
-                "unit" = ?
-        where "id" = ?
-    """;
+        String query =
+        """
+            update "ingredient_stock_movement"
+            set "id_ingredient" = ?, "quantity" = ?, "movement_datetime" = ?, "movement_type" = ?, "unit" = ?
+            where "id" = ?
+        """;
 
         try {
             PreparedStatement prs = connection.prepareStatement(query);
@@ -167,30 +160,9 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
     }
 
     @Override
-    public List<IngredientStockMovement> saveAll(List<IngredientStockMovement>
-                list) {
-        String query = """
-        insert into "ingredient_stock_movement"("id", "id_ingredient", "quantity", "movem
-                atetime", "movement_type",
-                "unit")
-        values (?, ?, ?, ?, ?, ?)
-    """;
-
-        try {
-            PreparedStatement prs = connection.prepareStatement(query);
-            for (IngredientStockMovement stockMovement : list) {
-                prs.setString(1, stockMovement.id());
-                prs.setString(2, stockMovement.idIngredient());
-                prs.setFloat(3, stockMovement.quantity());
-                prs.setTimestamp(4, Timestamp.valueOf(stockMovement.movementDatetime()));
-                prs.setObject(5, stockMovement.movementType(), Types.OTHER);
-                prs.setObject(6, stockMovement.unit(), Types.OTHER);
-                prs.addBatch();
-            }
-            prs.executeBatch();
-        } catch (SQLException error) {
-            throw new RuntimeException(
-error);
+    public List<IngredientStockMovement> saveAll(List<IngredientStockMovement>list) {
+        for(IngredientStockMovement priceHistory: list) {
+            this.crupdate(priceHistory);
         }
         return list;
     }

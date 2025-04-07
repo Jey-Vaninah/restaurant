@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -76,81 +75,17 @@ public class IngredientRestController {
     }
 
     @PutMapping("/ingredients/{id}/prices")
-    public ResponseEntity<List<PriceHistory>> addPriceHistoriess(
+    public ResponseEntity<List<PriceHistory>> addPriceHistories(
             @PathVariable String id, @RequestBody List<hei.vaninah.devoir.endpoint.rest.PriceHistory> priceHistories) {
 
         List<PriceHistory> savedPriceHistories = priceHistoryService.addMultiplePriceHistories(
-                priceHistories.stream().map(ph -> priceHistoryMapper.toDomain(ph, id)).toList()
+            priceHistories.stream().map(ph -> priceHistoryMapper.toDomain(ph, id)).toList()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPriceHistories);
     }
 
-
-//    @PutMapping("/ingredients/{ingredientId}/prices")
-//    public ResponseEntity<Object> updateIngredientPrices(@PathVariable Long ingredientId, @RequestBody List<CreateIngredientPrice> ingredientPrices) {
-//        List<Price> prices = ingredientPrices.stream()
-//                .map(ingredientPrice ->
-//                        new Price(ingredientPrice.getAmount(), ingredientPrice.getDateValue()))
-//                .toList();
-//        Ingredient ingredient = ingredientService.addPrices(ingredientId, prices);
-//        IngredientRest ingredientRest = ingredientRestMapper.toRest(ingredient);
-//        return ResponseEntity.ok().body(ingredientRest);
-//    }
-
-//    @PostMapping("/ingredients/{id}/prices")
-//    public ResponseEntity<List<PriceHistory>> addPriceHistories(
-//            @PathVariable String id,
-//            @RequestBody List<hei.vaninah.devoir.endpoint.rest.PriceHistory> priceHistories) {
-//
-//
-//        boolean hasNullDateTime = priceHistories.stream()
-//                .anyMatch(ph -> ph.getPriceDatetime() == null);
-//
-//        if (hasNullDateTime) {
-//            return ResponseEntity.badRequest().body(null); // Returning 400 Bad Request if dateTime is null
-//        }
-//
-//
-//        List<PriceHistory> savedPriceHistories = priceHistoryService.addMultiplePriceHistories(
-//                priceHistories.stream()
-//                        .map(ph -> priceHistoryMapper.toDomain(ph, id))
-//                        .collect(Collectors.toList())
-//        );
-//
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedPriceHistories);
-//    }
-
-    @PostMapping("/ingredients/{id}/prices")
-    public ResponseEntity<List<PriceHistory>> addPriceHistories(
-            @PathVariable String id,
-            @RequestBody List<hei.vaninah.devoir.endpoint.rest.PriceHistory> priceHistories) {
-
-        priceHistories.forEach(ph -> {
-            if (ph.getPriceDatetime() == null) {
-                System.out.println("PriceDatetime null trouvé pour le PriceHistory avec ID: " + ph.getId());
-            }
-        });
-
-        boolean hasNullDateTime = priceHistories.stream()
-                .anyMatch(ph -> ph.getPriceDatetime() == null);
-
-        if (hasNullDateTime) {
-            return ResponseEntity.badRequest().body(null); // Renvoi 400 Bad Request si priceDatetime est null
-        }
-
-        List<PriceHistory> savedPriceHistories = priceHistoryService.addMultiplePriceHistories(
-                priceHistories.stream()
-                        .map(ph -> priceHistoryMapper.toDomain(ph, id))
-                        .collect(Collectors.toList())
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPriceHistories);
-    }
-
-
-    @PostMapping("/ingredients/{id}/stocks")
+    @PutMapping("/ingredients/{id}/stockMovements")
     public ResponseEntity<List<IngredientStockMovement>> addStockMovements(
             @PathVariable String id, @RequestBody List<hei.vaninah.devoir.endpoint.rest.StockMovement> stockMovements) {
 
@@ -160,5 +95,4 @@ public class IngredientRestController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStockMovements);
     }
-
 }

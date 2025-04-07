@@ -1,6 +1,5 @@
 package hei.vaninah.devoir.endpoint.mapper;
 
-
 import hei.vaninah.devoir.entity.IngredientStockMovement;
 import org.springframework.stereotype.Component;
 

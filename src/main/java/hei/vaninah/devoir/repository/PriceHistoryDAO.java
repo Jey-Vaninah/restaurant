@@ -24,9 +24,7 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
 
     @Override
     public PriceHistory findById(String id){
-        String query = """
-            select * from "ingredient_price_history" where "id" = ?
-        """;
+        String query = "SELECT * FROM ingredient_price_history WHERE id = ?";
         try{
             PreparedStatement st = connection.prepareStatement(query);
             st.setString(1, id);
@@ -136,23 +134,8 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
 
     @Override
     public List<PriceHistory> saveAll(List<PriceHistory> list) {
-        String query = """
-            insert into "ingredient_price_history"("id", "id_ingredient", "price_datetime", "unit_price")
-            values (?, ?, ?, ?)
-        """;
-
-        try {
-            PreparedStatement prs = connection.prepareStatement(query);
-            for (PriceHistory priceHistory : list) {
-                prs.setString(1, priceHistory.getId());
-                prs.setString(2, priceHistory.getIdIngredient());
-                prs.setTimestamp(3, Timestamp.valueOf(priceHistory.getPriceDatetime()));
-                prs.setBigDecimal(4, priceHistory.getUnitPrice());
-                prs.addBatch();
-            }
-            prs.executeBatch();
-        } catch (SQLException error) {
-            throw new RuntimeException(error);
+        for(PriceHistory priceHistory: list) {
+            this.crupdate(priceHistory);
         }
         return list;
     }
