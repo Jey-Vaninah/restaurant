@@ -1,10 +1,10 @@
 do
 $$
-begin
+    begin
         if not exists(select from pg_type where typname = 'unit') then
-create type "unit" as enum ('G', 'L', 'U');
-end if;
-end
+            create type "unit" as enum ('G', 'L', 'U');
+        end if;
+    end
 $$;
 
 create table if not exists "ingredient"
@@ -15,3 +15,5 @@ create table if not exists "ingredient"
     "unit_price" DECIMAL(10,2) check ("unit_price" > 0) not null,
     "unit" unit not null
 );
+
+

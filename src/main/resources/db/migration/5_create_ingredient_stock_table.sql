@@ -1,10 +1,10 @@
 do
 $$
-begin
+    begin
         if not exists(select from pg_type where typname = 'ingredient_stock_movement_type') then
-create type "ingredient_stock_movement_type" as enum ('IN', 'OUT');
-end if;
-end
+            create type "ingredient_stock_movement_type" as enum ('IN', 'OUT');
+        end if;
+    end
 $$;
 
 create table if not exists "ingredient_stock_movement"
