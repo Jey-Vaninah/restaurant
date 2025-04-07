@@ -43,4 +43,9 @@ public class OrderService {
        dishOrderDAO.saveAll(dishOrders);
        return dao.findByReference(orderReference);
     }
+
+    public Order updateDishOrder(String orderReference, DishOrder dishOrder){
+         dishOrderDAO.update(dishOrder);
+        return dao.findByReference(orderReference);
+    }
 }

@@ -26,8 +26,7 @@ public class DishOrderMapper {
         );
     }
 
-    public hei.vaninah.devoir.entity.DishOrder createToDomain(String reference, CreateDishOrder createDishOrder)
-    {
+    public hei.vaninah.devoir.entity.DishOrder createToDomain(String reference, CreateDishOrder createDishOrder) {
         return new hei.vaninah.devoir.entity.DishOrder(
             createDishOrder.getId(),
             orderDAO.findByReference(reference).getId(),
