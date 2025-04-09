@@ -42,4 +42,18 @@ public class OrderController {
             )
         );
     };
+
+    @PutMapping("/orders/{reference}/dishes/{dishId}")
+    public Order updateDishStatus(
+            @PathVariable("reference")String reference,
+            @PathVariable("dishId") String dishId,
+            @RequestBody DishOrder dishOrder) {
+        return orderMapper.toRest(
+                orderService.updateDishStatus(
+                        reference,
+                        dishOrderMapper.updateToDomain(reference,dishOrder)
+                )
+        );
+    }
+
 }

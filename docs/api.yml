@@ -17,6 +17,10 @@ tags:
     description: Operations related to ingredient prices
   - name: Stock Movements
     description: Operations related to ingredient stock movements
+  - name: Dishes
+    description: Operations related to dish
+  - name: Orders
+    description: Operations related to order
 
 paths:
   /ping:
@@ -207,6 +211,139 @@ paths:
                 items:
                   $ref: '#/components/schemas/IngredientStockMovement'
 
+  /dishes:
+    get:
+      tags:
+        - Dishes
+      summary: Get list dishes
+      operationId: getDishes
+      responses:
+        '200':
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+
+  /dishes/{id}/ingredients:
+    put:
+      tags:
+        - Dishes
+      summary: Add or update ingredients for a dish
+      operationId: updateDishes
+      parameters:
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DishIngredient'
+      responses:
+        '200':
+          description: Updated dish
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+
+  /orders/{reference}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by reference
+      operationId: getOrders
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: get Order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /orders/{reference}/dishes:
+    put:
+      tags:
+        - Orders
+      summary: Add or update dishes for an order
+      operationId: updateDishOrders
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateDishOrder'
+      responses:
+        '200':
+          description: Updated orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /orders/{reference}/dishes/{dishId}:
+    put:
+      tags:
+        - Dish Status
+      summary: Update status for a dish in order
+      operationId: updateDishStatus
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DishOrder'
+      responses:
+        '200':
+          description: Updated orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DishOrder'
+
 components:
   schemas:
     Ingredient:
@@ -264,3 +401,125 @@ components:
           type: string
         unit:
           type: string
+
+    Dish:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        availableQuantity:
+          type: integer
+        price:
+          type: number
+          format: big decimal
+        ingredient:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+
+    DishIngredient:
+      type: object
+      properties:
+        requiredQuantity:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/Unit'
+        idIngredient:
+          type: string
+
+    Unit:
+      type: string
+      enum:
+        - G
+        - L
+        - U
+
+    StatusHistory:
+      type: string
+      enum:
+        - CREATED
+        - CONFIRMED
+        - IN_PREPARATION
+        - COMPLETED
+        - SERVED
+
+    DishOrderStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        dishOrderId:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusHistory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DishOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        dish:
+          $ref: '#/components/schemas/Dish'
+        quantity:
+          type: integer
+        dishOrderStatus:
+          $ref: '#/components/schemas/DishOrderStatus'
+
+    OrderStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusHistory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        reference:
+          type: string
+        createAt:
+          type: string
+          format: date-time
+        updated:
+          $ref: '#/components/schemas/OrderStatus'
+        orderStatus:
+          type: number
+          format: big decimal
+        dishOrder:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishOrder'
+
+    CreateDishOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        dishId:
+          type: string
+        quantity:
+          type: integer
+        status:
+          $ref: '#/components/schemas/StatusHistory'
