@@ -24,13 +24,13 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
         List<IngredientStockMovement> ingredientStockMovements = this.ingredientStockMovementDAO.findByIngredientId(id);
 
         return new Ingredient(
-                id,
-                rs.getString("name"),
-                rs.getTimestamp("update_datetime").toLocalDateTime(),
-                rs.getBigDecimal("unit_price"),
-                Unit.valueOf(rs.getString("unit")),
-                priceHistories,
-                ingredientStockMovements
+            id,
+            rs.getString("name"),
+            rs.getTimestamp("update_datetime").toLocalDateTime(),
+            rs.getBigDecimal("unit_price"),
+            Unit.valueOf(rs.getString("unit")),
+            priceHistories,
+            ingredientStockMovements
         );
     }
 

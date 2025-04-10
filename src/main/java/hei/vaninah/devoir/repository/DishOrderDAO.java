@@ -27,11 +27,11 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
         List<DishOrderStatus> dishOrderStatuses = dishOrderStatusDAO.findByDishOrderId(id);
 
         return new DishOrder(
-                id,
-                rs.getString("id_order"),
-                dish,
-                rs.getInt("quantity"),
-                dishOrderStatuses
+            id,
+            rs.getString("id_order"),
+            dish,
+            rs.getInt("quantity"),
+            dishOrderStatuses
         );
     }
 

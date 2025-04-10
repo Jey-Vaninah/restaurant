@@ -18,12 +18,12 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
 
     private IngredientStockMovement resultSetToIngredientStock(ResultSet rs) throws SQLException {
         return new IngredientStockMovement(
-                rs.getString("id"),
-                rs.getString("id_ingredient"),
-                rs.getFloat("quantity"),
-                rs.getTimestamp("movement_datetime").toLocalDateTime(),
-                IngredientStockMovementType.valueOf(rs.getString("movement_type")),
-                Unit.valueOf(rs.getString("unit"))
+            rs.getString("id"),
+            rs.getString("id_ingredient"),
+            rs.getFloat("quantity"),
+            rs.getTimestamp("movement_datetime").toLocalDateTime(),
+            IngredientStockMovementType.valueOf(rs.getString("movement_type")),
+            Unit.valueOf(rs.getString("unit"))
         );
     }
 

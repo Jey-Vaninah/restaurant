@@ -27,12 +27,12 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
         List<DishOrder> dishOrders = dishOrderDAO.findByOrderId(id);
 
         return new hei.vaninah.devoir.entity.Order(
-                id,
-                rs.getString("reference"),
-                rs.getTimestamp("created_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at").toLocalDateTime(),
-                new ArrayList<>(dishOrders),
-                new ArrayList<>(orderStatuses)
+            id,
+            rs.getString("reference"),
+            rs.getTimestamp("created_at").toLocalDateTime(),
+            rs.getTimestamp("updated_at").toLocalDateTime(),
+            new ArrayList<>(dishOrders),
+            new ArrayList<>(orderStatuses)
         );
     }
 
@@ -162,11 +162,7 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
     }
 
     public long getDishProcessingTime(String dishOrderId, LocalDateTime startDate, LocalDateTime endDate, String timeUnit, String durationType) {
-        // Vous pouvez ici ajouter la logique de calcul de la durée, en fonction des dates et de l'unité de temps.
-        // Exemple simple : retourner la différence en secondes.
         long durationInSeconds = Duration.between(startDate, endDate).getSeconds();
-
-        // Ajuster la durée selon l'unité et le type de durée, par exemple convertir en minutes ou heures selon le cas.
         switch (timeUnit) {
             case "minutes":
                 return durationInSeconds / 60;

@@ -23,12 +23,12 @@ public class IngredientService {
         List<Ingredient> allIngredients = dao.findAll(pagination, order);
 
         return allIngredients.stream()
-                .filter(ingredient -> {
-                    BigDecimal price = ingredient.getUnitPrice();
-                    return (minPrice == null || price.compareTo(minPrice) >= 0) &&
-                            (maxPrice == null || price.compareTo(maxPrice) <= 0);
-                })
-                .collect(Collectors.toList());
+             .filter(ingredient -> {
+                 BigDecimal price = ingredient.getUnitPrice();
+                 return (minPrice == null || price.compareTo(minPrice) >= 0) &&
+                        (maxPrice == null || price.compareTo(maxPrice) <= 0);
+             }   )
+             .collect(Collectors.toList());
     }
 
     public Optional<Ingredient> getIngredientById(String id) {

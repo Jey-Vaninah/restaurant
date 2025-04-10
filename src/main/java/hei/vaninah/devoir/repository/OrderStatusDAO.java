@@ -17,18 +17,18 @@ public class OrderStatusDAO implements RestaurantManagementDAO<OrderStatus> {
 
     private OrderStatus resultSetToOrderStatus(ResultSet rs) throws SQLException {
         return new OrderStatus(
-                rs.getString("id"),
-                rs.getString("id_order"),
-                StatusHistory.valueOf(rs.getString("status")),
-                rs.getTimestamp("created_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at").toLocalDateTime()
+            rs.getString("id"),
+            rs.getString("id_order"),
+            StatusHistory.valueOf(rs.getString("status")),
+            rs.getTimestamp("created_at").toLocalDateTime(),
+            rs.getTimestamp("updated_at").toLocalDateTime()
         );
     }
 
     public List<OrderStatus> findByOrderId(String orderId) {
         List<OrderStatus> orderStatuses = new ArrayList<>();
         String query = """
-            select * from "order_status" where id_order = ? order by id asc
+             select * from "order_status" where id_order = ? order by id asc
         """;
 
         try {

@@ -74,18 +74,18 @@ public class OrderService {
             List<OrderStatus> statusHistories = List.of();
 
             LocalDateTime inProgressTime = statusHistories.stream()
-                    .filter(status -> status.getStatus() == IN_PREPARATION)
-                    .filter(status -> !status.getCreatedAt().isBefore(dateDebut) && !status.getCreatedAt().isAfter(dateFin))
-                    .map(OrderStatus::getCreatedAt)
-                    .findFirst()
-                    .orElse(null);
+                 .filter(status -> status.getStatus() == IN_PREPARATION)
+                 .filter(status -> !status.getCreatedAt().isBefore(dateDebut) && !status.getCreatedAt().isAfter(dateFin))
+                 .map(OrderStatus::getCreatedAt)
+                 .findFirst()
+                 .orElse(null);
 
             LocalDateTime finishedTime = statusHistories.stream()
-                    .filter(status -> status.getStatus() == SERVED)
-                    .filter(status -> !status.getCreatedAt().isBefore(dateDebut) && !status.getCreatedAt().isAfter(dateFin))
-                    .map(OrderStatus::getCreatedAt)
-                    .findFirst()
-                    .orElse(null);
+                 .filter(status -> status.getStatus() == SERVED)
+                 .filter(status -> !status.getCreatedAt().isBefore(dateDebut) && !status.getCreatedAt().isAfter(dateFin))
+                 .map(OrderStatus::getCreatedAt)
+                 .findFirst()
+                 .orElse(null);
 
             if (inProgressTime != null && finishedTime != null) {
                 durations.add(Duration.between(inProgressTime, finishedTime));

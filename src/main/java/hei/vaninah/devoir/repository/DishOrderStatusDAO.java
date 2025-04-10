@@ -17,11 +17,11 @@ public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStat
 
     private DishOrderStatus resultSetToDishOrderStatus(ResultSet rs) throws SQLException {
         return new DishOrderStatus(
-                rs.getString("id"),
-                rs.getString("id_dish_order"),
-                StatusHistory.valueOf(rs.getString("status")),
-                rs.getTimestamp("created_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at").toLocalDateTime()
+            rs.getString("id"),
+            rs.getString("id_dish_order"),
+            StatusHistory.valueOf(rs.getString("status")),
+            rs.getTimestamp("created_at").toLocalDateTime(),
+            rs.getTimestamp("updated_at").toLocalDateTime()
         );
     }
 
