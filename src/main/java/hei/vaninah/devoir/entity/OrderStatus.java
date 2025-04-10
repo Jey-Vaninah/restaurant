@@ -1,7 +1,6 @@
 package hei.vaninah.devoir.entity;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -15,5 +14,4 @@ public class OrderStatus {
     private StatusHistory status;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
-
 }

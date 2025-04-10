@@ -16,10 +16,10 @@ public class DishIngredientDAO implements RestaurantManagementDAO<DishIngredient
 
     DishIngredient resultSetToDishIngredient(ResultSet rs) throws SQLException {
         return new DishIngredient(
-                rs.getString("id_dish"),
-                rs.getString("id_ingredient"),
-                rs.getFloat("required_quantity"),
-                Unit.valueOf(rs.getString("unit"))
+            rs.getString("id_dish"),
+            rs.getString("id_ingredient"),
+            rs.getFloat("required_quantity"),
+            Unit.valueOf(rs.getString("unit"))
         );
     }
 
@@ -114,5 +114,4 @@ public class DishIngredientDAO implements RestaurantManagementDAO<DishIngredient
         }
         return list;
     }
-
 }

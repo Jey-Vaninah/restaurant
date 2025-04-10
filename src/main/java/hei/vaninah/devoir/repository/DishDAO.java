@@ -20,18 +20,17 @@ public class DishDAO implements RestaurantManagementDAO<Dish> {
     private final IngredientDAO ingredientDAO;
     private final DishIngredientDAO dishIngredientDAO;
 
-
     public Dish resultSetToDish(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         List<Ingredient> ingredients = this.ingredientDAO.findByDishId(id);
         List<DishIngredient> dishIngredients = this.dishIngredientDAO.findByDishId(id);
 
         return new Dish(
-                id,
-                rs.getString("name"),
-                rs.getBigDecimal("unit_price"),
-                ingredients,
-                dishIngredients
+            id,
+            rs.getString("name"),
+            rs.getBigDecimal("unit_price"),
+            ingredients,
+            dishIngredients
         );
 
     }

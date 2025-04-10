@@ -15,7 +15,6 @@ import java.util.List;
 public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStatus> {
     private final Connection connection;
 
-
     private DishOrderStatus resultSetToDishOrderStatus(ResultSet rs) throws SQLException {
         return new DishOrderStatus(
                 rs.getString("id"),

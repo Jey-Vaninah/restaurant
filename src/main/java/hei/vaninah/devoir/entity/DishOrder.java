@@ -32,7 +32,6 @@ public class DishOrder {
                 .orElse(new DishOrderStatus(randomUUID().toString(), this.getId(), StatusHistory.CREATED, now(), now()));
     }
 
-
     public BigDecimal getCost() {
         return this.dish.getUnitPrice().multiply(new BigDecimal(this.quantity));
     }

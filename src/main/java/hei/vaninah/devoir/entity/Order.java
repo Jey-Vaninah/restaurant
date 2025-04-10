@@ -1,18 +1,13 @@
 package hei.vaninah.devoir.entity;
 
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static hei.vaninah.devoir.entity.StatusHistory.*;
 import static java.time.LocalDateTime.now;

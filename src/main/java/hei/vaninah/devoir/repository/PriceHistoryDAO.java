@@ -15,10 +15,10 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
 
     private PriceHistory resultSetToPriceHistory(ResultSet rs) throws SQLException {
         return new PriceHistory(
-                rs.getString("id"),
-                rs.getString("id_ingredient"),
-                rs.getTimestamp("price_datetime").toLocalDateTime(),
-                rs.getBigDecimal("unit_price")
+            rs.getString("id"),
+            rs.getString("id_ingredient"),
+            rs.getTimestamp("price_datetime").toLocalDateTime(),
+            rs.getBigDecimal("unit_price")
         );
     }
 
@@ -37,7 +37,6 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
             throw new RuntimeException(e);
         }
     }
-
 
     @Override
     public List<PriceHistory> findAll(Pagination pagination, Order order) {
@@ -98,7 +97,6 @@ public class PriceHistoryDAO implements RestaurantManagementDAO<PriceHistory> {
             throw new RuntimeException(error);
         }
     }
-
 
     @Override
     public PriceHistory update(PriceHistory toUpdate) {

@@ -96,7 +96,6 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
         return List.of();
     }
 
-
     @Override
     public hei.vaninah.devoir.entity.Order deleteById(String id) {
         return null;
@@ -177,5 +176,4 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
                 return durationInSeconds;
         }
     }
-
 }

@@ -15,5 +15,4 @@ public class PriceHistory {
     private String idIngredient;
     private LocalDateTime priceDatetime;
     private BigDecimal unitPrice;
-
 }

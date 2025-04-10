@@ -29,7 +29,6 @@ public class IngredientRestController {
     private final StockMovementMapper stockMovementMapper;
     private final StockMovementService stockMovementService;
 
-
     @GetMapping("/ingredients")
     public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> getIngredients(
         @RequestParam(name = "priceMinFilter", required = false) BigDecimal priceMinFilter,
@@ -45,7 +44,6 @@ public class IngredientRestController {
         List<Ingredient> ingredients = ingredientService.getIngredientsByPriceRange(priceMinFilter, priceMaxFilter, new Pagination(1,10) , new Order("name", Order.OrderValue.ASC));
         return ResponseEntity.ok(ingredients.stream().map(ingredientMapper::toRest).toList());
     }
-
 
     @GetMapping("/ingredients/{id}")
     public ResponseEntity<hei.vaninah.devoir.endpoint.rest.Ingredient> getIngredient(@PathVariable String id) {

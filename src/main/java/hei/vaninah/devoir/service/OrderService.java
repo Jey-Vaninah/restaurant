@@ -64,8 +64,7 @@ public class OrderService {
         return dao.getDishProcessingTime(dishOrderId, startDate, endDate, timeUnit, durationType);
     }
 
-    public long getProcessingTime(String dishId, LocalDateTime dateDebut, LocalDateTime dateFin,
-                                  String timeUnit, String aggregationType) {
+    public long getProcessingTime(String dishId, LocalDateTime dateDebut, LocalDateTime dateFin, String timeUnit, String aggregationType) {
 
         List<DishOrder> dishOrders = dishOrderDAO.findByDishIdAndOrderDateRange(dishId, dateDebut, dateFin);
 
@@ -101,7 +100,6 @@ public class OrderService {
         return convertDuration(Duration.ofSeconds(durationInSeconds), timeUnit);
     }
 
-
     private long calculateDurationByType(List<Duration> durations, String aggregationType) {
         if ("SUM".equalsIgnoreCase(aggregationType)) {
             return durations.stream().mapToLong(Duration::getSeconds).sum();
@@ -110,7 +108,6 @@ public class OrderService {
         }
         return 0;
     }
-
 
     private long convertDuration(Duration duration, String timeUnit) {
         return switch (timeUnit) {

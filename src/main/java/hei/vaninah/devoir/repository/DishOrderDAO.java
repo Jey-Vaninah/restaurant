@@ -21,7 +21,6 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
     private final DishOrderStatusDAO dishOrderStatusDAO;
     private final DishDAO dishDAO;
 
-
     private DishOrder resultSetToDishOrder(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         Dish dish = dishDAO.findById(rs.getString("id_dish"));
@@ -69,7 +68,6 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
             throw new RuntimeException("Error creating DishOrder: " + e.getMessage(), e);
         }
     }
-
 
     @Override
     public DishOrder findById(String id) {
@@ -160,5 +158,4 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
 
         return dishOrders;
     }
-
 }

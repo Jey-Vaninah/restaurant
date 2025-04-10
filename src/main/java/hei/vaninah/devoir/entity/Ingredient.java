@@ -20,7 +20,6 @@ public class Ingredient {
     private List<PriceHistory> priceHistories;
     private List<IngredientStockMovement> ingredientStockMovements;
 
-
     public Float getAvailableQuantity(LocalDateTime datetime){
         return this.ingredientStockMovements
                 .stream()

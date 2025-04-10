@@ -8,6 +8,5 @@ import lombok.Data;
 public class Criteria {
     private final String column;
     private final Object value;
-
 }
 

@@ -90,8 +90,7 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
     @Override
     public IngredientStockMovement deleteById(String id) {
         String query = """
-            delete from "ingredient_stock_movement" where "id"
-                = ?;
+            delete from "ingredient_stock_movement" where "id"= ?;
          """;
 
         try{

@@ -56,7 +56,6 @@ public class OrderStatusDAO implements RestaurantManagementDAO<OrderStatus> {
         ps.executeUpdate();
     }
 
-
     public void updateOrderStatus(String id, StatusHistory newStatus, LocalDateTime updatedAt) throws SQLException {
         String query = "UPDATE order_status SET status = ?, updated_at = ? WHERE id = ?";
 

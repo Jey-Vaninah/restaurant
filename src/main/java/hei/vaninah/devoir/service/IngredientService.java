@@ -20,7 +20,7 @@ public class IngredientService {
     }
 
     public List<Ingredient> getIngredientsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pagination pagination, Order order) {
-        List<Ingredient> allIngredients = dao.findAll(pagination ,order);
+        List<Ingredient> allIngredients = dao.findAll(pagination, order);
 
         return allIngredients.stream()
                 .filter(ingredient -> {

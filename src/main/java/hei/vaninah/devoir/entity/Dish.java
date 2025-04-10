@@ -63,5 +63,4 @@ public class Dish {
                 .min()
                 .orElse(0);
     }
-
 }

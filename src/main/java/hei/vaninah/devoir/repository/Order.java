@@ -15,5 +15,4 @@ public class Order {
         DESC,
         ASC
     }
-
 }
