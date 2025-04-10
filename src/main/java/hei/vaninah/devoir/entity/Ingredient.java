@@ -67,4 +67,12 @@ public class Ingredient {
     public Float getCurrentStock(){
         return this.getCurrentStock(LocalDateTime.now());
     }
+
+    public void addPriceHistories(List<PriceHistory> priceHistories){
+        this.priceHistories.addAll(priceHistories);
+    }
+
+    public void addStockMovements(List<IngredientStockMovement> stockMovements){
+        this.ingredientStockMovements.addAll(stockMovements);
+    }
 }

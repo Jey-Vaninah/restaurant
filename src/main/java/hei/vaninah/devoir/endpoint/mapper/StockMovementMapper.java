@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StockMovementMapper {
-    public IngredientStockMovement toDomain(hei.vaninah.devoir.endpoint.rest.StockMovement stockMovement, String idIngredient) {
+    public IngredientStockMovement toDomain(String idIngredient, hei.vaninah.devoir.endpoint.rest.StockMovement stockMovement) {
         return new IngredientStockMovement(
             stockMovement.getId(),
             idIngredient,
@@ -13,6 +13,16 @@ public class StockMovementMapper {
             stockMovement.getMovementDatetime(),
             stockMovement.getMovementType(),
             stockMovement.getUnit()
+        );
+    }
+
+    public hei.vaninah.devoir.endpoint.rest.StockMovement toRest(IngredientStockMovement stockMovement) {
+        return new hei.vaninah.devoir.endpoint.rest.StockMovement(
+            stockMovement.id(),
+            stockMovement.quantity(),
+            stockMovement.movementDatetime(),
+            stockMovement.movementType(),
+            stockMovement.unit()
         );
     }
 }

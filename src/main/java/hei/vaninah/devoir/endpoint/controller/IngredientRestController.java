@@ -4,13 +4,9 @@ import hei.vaninah.devoir.endpoint.mapper.IngredientMapper;
 import hei.vaninah.devoir.endpoint.mapper.PriceHistoryMapper;
 import hei.vaninah.devoir.endpoint.mapper.StockMovementMapper;
 import hei.vaninah.devoir.entity.Ingredient;
-import hei.vaninah.devoir.entity.IngredientStockMovement;
-import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
 import hei.vaninah.devoir.service.IngredientService;
-import hei.vaninah.devoir.service.PriceHistoryService;
-import hei.vaninah.devoir.service.StockMovementService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +20,8 @@ import java.util.List;
 public class IngredientRestController {
     private final IngredientService ingredientService;
     private final IngredientMapper ingredientMapper;
-    private final PriceHistoryService priceHistoryService;
     private final PriceHistoryMapper priceHistoryMapper;
     private final StockMovementMapper stockMovementMapper;
-    private final StockMovementService stockMovementService;
 
     @GetMapping("/ingredients")
     public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> getIngredients(
@@ -53,17 +47,22 @@ public class IngredientRestController {
     }
 
     @PostMapping("/ingredients")
-    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> addIngredients(@RequestBody List<Ingredient> ingredients) {
-        List<Ingredient> savedIngredients = ingredientService.addIngredients(ingredients);
+    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> addIngredients(@RequestBody List<hei.vaninah.devoir.endpoint.rest.Ingredient> ingredients) {
+        List<Ingredient> crupdates = ingredientService.crupdateIngredients(
+            ingredients.stream().map(ingredientMapper::createToDomain).toList()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            savedIngredients.stream().map(ingredientMapper::toRest).toList()
+            crupdates.stream().map(ingredientMapper::toRest).toList()
         );
     }
 
     @PutMapping("/ingredients")
-    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> updateIngredients(@RequestBody List<Ingredient> ingredients) {
-        List<Ingredient> updatedIngredients = ingredientService.updateIngredients(ingredients);
-        return ResponseEntity.ok(updatedIngredients.stream().map(ingredientMapper::toRest).toList());
+    public ResponseEntity<List<hei.vaninah.devoir.endpoint.rest.Ingredient>> updateIngredients(@RequestBody List<hei.vaninah.devoir.endpoint.rest.Ingredient> ingredients) {
+        List<Ingredient> crupdates = ingredientService.crupdateIngredients(
+            ingredients.stream().map(ingredientMapper::createToDomain).toList()
+        );
+
+        return ResponseEntity.ok(crupdates.stream().map(ingredientMapper::toRest).toList());
     }
 
     @DeleteMapping("/ingredients/{id}")
@@ -73,24 +72,30 @@ public class IngredientRestController {
     }
 
     @PutMapping("/ingredients/{id}/prices")
-    public ResponseEntity<List<PriceHistory>> addPriceHistories(
+    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.Ingredient> addPriceHistories(
             @PathVariable String id, @RequestBody List<hei.vaninah.devoir.endpoint.rest.PriceHistory> priceHistories) {
 
-        List<PriceHistory> savedPriceHistories = priceHistoryService.addMultiplePriceHistories(
+        Ingredient ingredient = ingredientService.addPriceHistories(
+            id,
             priceHistories.stream().map(ph -> priceHistoryMapper.toDomain(ph, id)).toList()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPriceHistories);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ingredientMapper.toRest(ingredient));
     }
 
     @PutMapping("/ingredients/{id}/stockMovements")
-    public ResponseEntity<List<IngredientStockMovement>> addStockMovements(
+    public ResponseEntity<hei.vaninah.devoir.endpoint.rest.Ingredient> addStockMovements(
             @PathVariable String id, @RequestBody List<hei.vaninah.devoir.endpoint.rest.StockMovement> stockMovements) {
 
-        List<IngredientStockMovement> savedStockMovements = stockMovementService.addMultipleMovements(
-                stockMovements.stream().map(sm -> stockMovementMapper.toDomain(sm, id)).toList()
+        Ingredient ingredient = ingredientService.addStockMovements(
+            id,
+            stockMovements.stream().map(stock -> stockMovementMapper.toDomain(id,stock)).toList()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStockMovements);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ingredientMapper.toRest(ingredient));
     }
 }

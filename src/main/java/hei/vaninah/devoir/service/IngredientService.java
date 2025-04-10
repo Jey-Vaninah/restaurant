@@ -1,6 +1,8 @@
 package hei.vaninah.devoir.service;
 
 import hei.vaninah.devoir.entity.Ingredient;
+import hei.vaninah.devoir.entity.IngredientStockMovement;
+import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.repository.IngredientDAO;
 import hei.vaninah.devoir.repository.Order;
 import hei.vaninah.devoir.repository.Pagination;
@@ -45,15 +47,7 @@ public class IngredientService {
         }
     }
 
-    public List<Ingredient> addIngredients(List<Ingredient> ingredients) {
-        try {
-            return dao.saveAll(ingredients);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Ingredient> updateIngredients(List<Ingredient> ingredients) {
+    public List<Ingredient> crupdateIngredients(List<Ingredient> ingredients) {
         try {
             return dao.saveAll(ingredients);
         } catch (SQLException e) {
@@ -64,6 +58,34 @@ public class IngredientService {
     public Ingredient deleteIngredient(String id) {
         try {
             return dao.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Ingredient addPriceHistories(String ingredientId, List<PriceHistory> priceHistories) {
+        Ingredient ingredient;
+        try {
+            ingredient = dao.findById(ingredientId);
+            if(ingredient == null) {
+                throw new RuntimeException("Ingredient not found");
+            }
+            ingredient.addPriceHistories(priceHistories);
+            return dao.crupdate(ingredient);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Ingredient addStockMovements(String ingredientId, List<IngredientStockMovement> stockMovements) {
+        Ingredient ingredient;
+        try {
+            ingredient = dao.findById(ingredientId);
+            if(ingredient == null) {
+                throw new RuntimeException("Ingredient not found");
+            }
+            ingredient.addStockMovements(stockMovements);
+            return dao.crupdate(ingredient);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
