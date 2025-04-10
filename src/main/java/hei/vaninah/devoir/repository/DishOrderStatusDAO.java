@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,27 +24,24 @@ public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStat
         );
     }
 
-    public List<DishOrderStatus> findByDishOrderId(String dishOrderId) {
+    public List<DishOrderStatus> findByDishOrderId(String dishOrderId) throws SQLException {
         List<DishOrderStatus> dishOrderStatuses = new ArrayList<>();
         String query = """
-            select * from "dish_order_status" where id_dish_order = ? order by "id" asc
+            select * from "dish_order_status" where id_dish_order = ? order by "updated_at" desc
         """;
 
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, dishOrderId);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                dishOrderStatuses.add(resultSetToDishOrderStatus(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishOrderId);
+        ResultSet rs = preparedStatement.executeQuery();
+        while(rs.next()){
+            dishOrderStatuses.add(resultSetToDishOrderStatus(rs));
         }
         return dishOrderStatuses;
     }
 
-    public void createDishOrderStatus(DishOrderStatus dishOrderStatus) throws SQLException {
-        String query = "INSERT INTO dish_order_status (id, id_dish_order, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+    @Override
+    public DishOrderStatus save(DishOrderStatus dishOrderStatus) throws SQLException {
+        String query = "insert into dish_order_status (id, id_dish_order, status, created_at, updated_at) values (?, ?, ?, ?, ?)";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, dishOrderStatus.getId());
         ps.setString(2, dishOrderStatus.getDishOrderId());
@@ -53,27 +49,48 @@ public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStat
         ps.setTimestamp(4, Timestamp.valueOf(dishOrderStatus.getCreatedAt()));
         ps.setTimestamp(5, Timestamp.valueOf(dishOrderStatus.getUpdatedAt()));
         ps.executeUpdate();
-    }
-
-    public void updateDishOrderStatus(String id, StatusHistory newStatus, LocalDateTime updatedAt) throws SQLException {
-        String query = "UPDATE dish_order_status SET status = ?, updated_at = ? WHERE id = ?";
-
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setString(1, newStatus.name());
-        ps.setTimestamp(2, Timestamp.valueOf(updatedAt));
-        ps.setString(3, id);
-
-        ps.executeUpdate();
+        return dishOrderStatus;
     }
 
     @Override
-    public DishOrderStatus findById(String id) {
+    public DishOrderStatus update(DishOrderStatus orderStatus) throws SQLException {
+        String query = "update dish_order_status set status = ?, updated_at = ? where id = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setObject(1, orderStatus.getStatus(), Types.OTHER);
+        ps.setTimestamp(2, Timestamp.valueOf(orderStatus.getUpdatedAt()));
+        ps.setString(3, orderStatus.getId());
+        ps.executeUpdate();
+        return orderStatus;
+    }
+
+    @Override
+    public DishOrderStatus findById(String id) throws SQLException {
+        String query = "select * from dish_order_status where id = ?";
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, id);
+        ResultSet rs = st.executeQuery();
+        if(rs.next()) {
+            return resultSetToDishOrderStatus(rs);
+        }
         return null;
     }
 
     @Override
-    public List<DishOrderStatus> findAll(Pagination pagination, Order order) {
-        return List.of();
+    public List<DishOrderStatus> findAll(Pagination pagination, Order order) throws SQLException {
+        List<DishOrderStatus> dishOrderStatuses = new ArrayList<>();
+        String query = """
+            select * from "dish_order_status"
+            order by "updated_at" desc limit ? offset ?
+        """;
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, pagination.getLimit());
+        preparedStatement.setInt(2, pagination.getOffset());
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            dishOrderStatuses.add(resultSetToDishOrderStatus(rs));
+        }
+        return dishOrderStatuses;
     }
 
     @Override
@@ -82,22 +99,19 @@ public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStat
     }
 
     @Override
-    public DishOrderStatus save(DishOrderStatus id) {
-        throw new RuntimeException("Not Implemented");
+    public DishOrderStatus crupdate(DishOrderStatus dishOrderStatus) throws SQLException {
+        if (findById(dishOrderStatus.getId()) != null) {
+            return update(dishOrderStatus);
+        } else {
+            return save(dishOrderStatus);
+        }
     }
 
     @Override
-    public DishOrderStatus update(DishOrderStatus id) {
-        throw new RuntimeException("Not Implemented");
-    }
-
-    @Override
-    public DishOrderStatus crupdate(DishOrderStatus id) {
-        throw new RuntimeException("Not Implemented");
-    }
-
-    @Override
-    public List<DishOrderStatus> saveAll(List<DishOrderStatus> list) {
-        return List.of();
+    public List<DishOrderStatus> saveAll(List<DishOrderStatus> list) throws SQLException {
+        for(DishOrderStatus dishOrderStatus: list) {
+            this.crupdate(dishOrderStatus);
+        }
+        return list;
     }
 }

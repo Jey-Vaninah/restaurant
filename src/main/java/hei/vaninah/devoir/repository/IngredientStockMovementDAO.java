@@ -2,7 +2,6 @@ package hei.vaninah.devoir.repository;
 
 import hei.vaninah.devoir.entity.IngredientStockMovement;
 import hei.vaninah.devoir.entity.IngredientStockMovementType;
-import hei.vaninah.devoir.entity.PriceHistory;
 import hei.vaninah.devoir.entity.Unit;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -27,106 +26,90 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
         );
     }
 
-    public List<IngredientStockMovement> findByIngredientId(String idIngredient) {
+    public List<IngredientStockMovement> findByIngredientId(String idIngredient) throws SQLException {
         List<IngredientStockMovement> ingredientStockMovements = new ArrayList<>();
         String query = """
             select *
                 from "ingredient_stock_movement"
                 where "id_ingredient" = ?
-                order by "id" asc 
+                order by "movement_datetime" desc
         """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, idIngredient);
-            ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                ingredientStockMovements.add(resultSetToIngredientStock(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, idIngredient);
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            ingredientStockMovements.add(resultSetToIngredientStock(rs));
         }
         return ingredientStockMovements;
     }
 
     @Override
-    public IngredientStockMovement findById(String id) {
+    public IngredientStockMovement findById(String id) throws SQLException {
         String query = """
             select * from ingredient_stock_movement where "id" = ?;
         """;
-        try {
-            PreparedStatement st = connection.prepareStatement(query);
-            st.setString(1, id);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                return resultSetToIngredientStock(rs);
-            }
-            return null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, id);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            return resultSetToIngredientStock(rs);
         }
+        return null;
     }
 
     @Override
-    public List<IngredientStockMovement> findAll(Pagination pagination, Order order) {
+    public List<IngredientStockMovement> findAll(Pagination pagination, Order order) throws SQLException {
         List<IngredientStockMovement> stockMovements = new ArrayList<>();
         String query = """
-            select * from "ingredient_stock_movement"
-            order by "movement_datetime" """ + order.getOrderValue() + "limit ? offset ?";
+           select * from "ingredient_stock_movement"
+           order by "movement_datetime" desc limit ? offset ?;
+        """;
 
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, pagination.getPage());
-            preparedStatement.setInt(2, pagination.getPageSize());
-            ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                stockMovements.add(resultSetToIngredientStock(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, pagination.getLimit());
+        preparedStatement.setInt(2, pagination.getOffset());
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            stockMovements.add(resultSetToIngredientStock(rs));
         }
         return stockMovements;
     }
 
     @Override
-    public IngredientStockMovement deleteById(String id) {
+    public IngredientStockMovement deleteById(String id) throws SQLException {
         String query = """
             delete from "ingredient_stock_movement" where "id"= ?;
          """;
 
-        try{
-            final IngredientStockMovement toDelete = this.findById((id));
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString (1, toDelete.id());
-            prs.executeUpdate();
-            return toDelete;
-        }catch (SQLException error){
-            throw new RuntimeException(error);
-        }
+        IngredientStockMovement toDelete = this.findById((id));
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toDelete.id());
+        prs.executeUpdate();
+        return toDelete;
     }
 
     @Override
-    public IngredientStockMovement save(IngredientStockMovement toCreate) {
+    public IngredientStockMovement save(IngredientStockMovement toCreate) throws SQLException {
         String query = """
-           insert into "ingredient_stock_movement"("id", "id_ingredient", "quantity", "movement_datetime", "movement_type", "unit")
+            insert into "ingredient_stock_movement"("id", "id_ingredient", "quantity", "movement_datetime", "movement_type", "unit")
             values (?, ?, ?, ?, ?, ?);
         """;
-        try{
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString (1, toCreate.id());
-            prs.setString (2, toCreate.idIngredient());
-            prs.setFloat(3, toCreate.quantity());
-            prs.setTimestamp(4, Timestamp.valueOf(toCreate.movementDatetime()));
-            prs.setObject(5, toCreate.movementType(), Types.OTHER);
-            prs.setObject(6, toCreate.unit(), Types.OTHER);
-            prs.executeUpdate();
-            return this.findById(toCreate.id());
-        }catch (SQLException error){
-            throw new RuntimeException(error);
-        }
+
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toCreate.id());
+        prs.setString (2, toCreate.idIngredient());
+        prs.setFloat(3, toCreate.quantity());
+        prs.setTimestamp(4, Timestamp.valueOf(toCreate.movementDatetime()));
+        prs.setObject(5, toCreate.movementType(), Types.OTHER);
+        prs.setObject(6, toCreate.unit(), Types.OTHER);
+        prs.executeUpdate();
+        return this.findById(toCreate.id());
     }
 
     @Override
-    public IngredientStockMovement update(IngredientStockMovement toUpdate) {
+    public IngredientStockMovement update(IngredientStockMovement toUpdate) throws SQLException {
         String query =
         """
             update "ingredient_stock_movement"
@@ -134,23 +117,19 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
             where "id" = ?
         """;
 
-        try {
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString(1, toUpdate.idIngredient());
-            prs.setFloat(2, toUpdate.quantity());
-            prs.setTimestamp(3, Timestamp.valueOf(toUpdate.movementDatetime()));
-            prs.setObject(4, toUpdate.movementType(), Types.OTHER);
-            prs.setObject(5, toUpdate.unit(), Types.OTHER);
-            prs.setString(6, toUpdate.id());
-            prs.executeUpdate();
-            return this.findById(toUpdate.id());
-        } catch (SQLException error) {
-            throw new RuntimeException(error);
-        }
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString(1, toUpdate.idIngredient());
+        prs.setFloat(2, toUpdate.quantity());
+        prs.setTimestamp(3, Timestamp.valueOf(toUpdate.movementDatetime()));
+        prs.setObject(4, toUpdate.movementType(), Types.OTHER);
+        prs.setObject(5, toUpdate.unit(), Types.OTHER);
+        prs.setString(6, toUpdate.id());
+        prs.executeUpdate();
+        return this.findById(toUpdate.id());
     }
 
     @Override
-    public IngredientStockMovement crupdate(IngredientStockMovement stockMovement) {
+    public IngredientStockMovement crupdate(IngredientStockMovement stockMovement) throws SQLException {
         if (findById(stockMovement.id()) != null) {
             return update(stockMovement);
         } else {
@@ -159,7 +138,7 @@ public class IngredientStockMovementDAO implements RestaurantManagementDAO<Ingre
     }
 
     @Override
-    public List<IngredientStockMovement> saveAll(List<IngredientStockMovement>list) {
+    public List<IngredientStockMovement> saveAll(List<IngredientStockMovement>list) throws SQLException {
         for(IngredientStockMovement priceHistory: list) {
             this.crupdate(priceHistory);
         }

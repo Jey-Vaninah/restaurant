@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,81 +24,104 @@ public class OrderStatusDAO implements RestaurantManagementDAO<OrderStatus> {
         );
     }
 
-    public List<OrderStatus> findByOrderId(String orderId) {
+    public List<OrderStatus> findByOrderId(String orderId) throws SQLException {
         List<OrderStatus> orderStatuses = new ArrayList<>();
         String query = """
-             select * from "order_status" where id_order = ? order by id asc
+            select * from "order_status" where id_order = ? order by id;
         """;
 
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, orderId);
-            ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                orderStatuses.add(resultSetToOrderStatus(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, orderId);
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            orderStatuses.add(resultSetToOrderStatus(rs));
         }
         return orderStatuses;
     }
 
-    public void insertOrderStatus(OrderStatus orderStatus) throws SQLException {
-        String query = "INSERT INTO order_status (id, id_order, status, updated_at, created_date) VALUES (?, ?, ?, ?, ?)";
-
+    @Override
+    public OrderStatus save(OrderStatus orderStatus) throws SQLException {
+        String query = "insert into order_status (id, id_order, status, updated_at, created_at) values (?, ?, ?, ?, ?)";
         PreparedStatement ps = connection.prepareStatement(query);
+
         ps.setString(1, orderStatus.getId());
         ps.setString(2, orderStatus.getIdOrder());
-        ps.setObject(3, orderStatus.getStatus(), Types.OTHER); // Convertir en chaîne
+        ps.setObject(3, orderStatus.getStatus(), Types.OTHER);
         ps.setTimestamp(4, Timestamp.valueOf(orderStatus.getUpdatedAt()));
         ps.setTimestamp(5, Timestamp.valueOf(orderStatus.getUpdatedAt()));
         ps.executeUpdate();
+        return orderStatus;
     }
 
-    public void updateOrderStatus(String id, StatusHistory newStatus, LocalDateTime updatedAt) throws SQLException {
-        String query = "UPDATE order_status SET status = ?, updated_at = ? WHERE id = ?";
+    @Override
+    public OrderStatus update(OrderStatus orderStatus) throws SQLException {
+        String query = "update order_status set status = ?, updated_at = ? where id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, newStatus.name());
-            ps.setTimestamp(2, Timestamp.valueOf(updatedAt));
-            ps.setString(3, id);
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setObject(1, orderStatus.getStatus(), Types.OTHER);
+        ps.setTimestamp(2, Timestamp.valueOf(orderStatus.getUpdatedAt()));
+        ps.setString(3, orderStatus.getId());
+        ps.executeUpdate();
+        return orderStatus;
+    }
 
-            ps.executeUpdate();
+    @Override
+    public OrderStatus findById(String id) throws SQLException {
+        String query = "select * from order_status where id = ?";
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, id);
+        ResultSet rs = st.executeQuery();
+        if(rs.next()) {
+            return resultSetToOrderStatus(rs);
+        }
+        return null;
+    }
+
+    @Override
+    public List<OrderStatus> findAll(Pagination pagination, Order order) throws SQLException {
+        List<OrderStatus> orderStatuses = new ArrayList<>();
+        String query = """
+            select * from "dish_order_status"
+            order by "updated_at" desc limit ? offset ?
+        """;
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, pagination.getLimit());
+        preparedStatement.setInt(2, pagination.getOffset());
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            orderStatuses.add(resultSetToOrderStatus(rs));
+        }
+        return orderStatuses;
+    }
+
+    @Override
+    public OrderStatus deleteById(String id) throws SQLException {
+        String query = """
+            delete from "order_status" where "id" = ?;
+        """;
+
+        OrderStatus toDelete = this.findById((id));
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toDelete.getId());
+        prs.executeUpdate();
+        return toDelete;
+    }
+
+    @Override
+    public OrderStatus crupdate(OrderStatus orderStatus) throws SQLException {
+        if (findById(orderStatus.getId()) != null) {
+            return update(orderStatus);
+        } else {
+            return save(orderStatus);
         }
     }
 
     @Override
-    public OrderStatus findById(String id) {
-        return null;
-    }
-
-    @Override
-    public List<OrderStatus> findAll(Pagination pagination, Order order) {
-        return List.of();
-    }
-
-    @Override
-    public OrderStatus deleteById(String id) {
-        return null;
-    }
-
-    @Override
-    public OrderStatus save(OrderStatus id) {
-        return null;
-    }
-
-    @Override
-    public OrderStatus update(OrderStatus id) {
-        return null;
-    }
-
-    @Override
-    public OrderStatus crupdate(OrderStatus id) {
-        return null;
-    }
-
-    @Override
-    public List<OrderStatus> saveAll(List<OrderStatus> list) {
-        return List.of();
+    public List<OrderStatus> saveAll(List<OrderStatus> list) throws SQLException {
+        for(OrderStatus orderStatus: list) {
+            this.crupdate(orderStatus);
+        }
+        return list;
     }
 }
