@@ -21,7 +21,7 @@ public class DishOrderStatusMapper {
 
         return new DishOrderStatus(
             randomUUID().toString(),
-            dishOrder.getOrderId(),
+            dishOrder.getId(),
             status.getActualStatus(),
             now(),
             now()

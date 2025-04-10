@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -47,7 +48,7 @@ public class OrderController {
     public Order updateDishStatus(
         @PathVariable("reference") String reference,
         @PathVariable("dishId") String dishId,
-        @RequestBody DishOrderStatus updateRequest) {
+        @RequestBody DishOrderStatus updateRequest) throws SQLException {
 
         return orderMapper.toRest(
             orderService.updateDishOrderStatus(

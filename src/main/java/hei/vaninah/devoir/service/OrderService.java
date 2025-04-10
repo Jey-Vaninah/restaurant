@@ -7,6 +7,7 @@ import hei.vaninah.devoir.repository.OrderDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,8 +54,8 @@ public class OrderService {
         return dao.findByReference(orderReference);
     }
 
-    public Order updateDishOrderStatus(String orderReference, DishOrderStatus dishOrderStatus){
-        dishOrderStatusDAO.save(dishOrderStatus);
+    public Order updateDishOrderStatus(String orderReference, DishOrderStatus dishOrderStatus) throws SQLException {
+        dishOrderStatusDAO.createDishOrderStatus(dishOrderStatus);
         return dao.findByReference(orderReference);
     }
 

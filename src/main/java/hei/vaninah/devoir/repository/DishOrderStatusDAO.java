@@ -51,8 +51,8 @@ public class DishOrderStatusDAO implements RestaurantManagementDAO<DishOrderStat
         ps.setString(1, dishOrderStatus.getId());
         ps.setString(2, dishOrderStatus.getDishOrderId());
         ps.setObject(3, dishOrderStatus.getStatus(), Types.OTHER);
-        ps.setString(4, Timestamp.valueOf(dishOrderStatus.getCreatedAt()).toLocalDateTime().toString());
-        ps.setString(5, Timestamp.valueOf(dishOrderStatus.getUpdatedAt()).toLocalDateTime().toString());
+        ps.setTimestamp(4, Timestamp.valueOf(dishOrderStatus.getCreatedAt()));
+        ps.setTimestamp(5, Timestamp.valueOf(dishOrderStatus.getUpdatedAt()));
         ps.executeUpdate();
     }
 
