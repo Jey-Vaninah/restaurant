@@ -99,7 +99,7 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
     public hei.vaninah.devoir.entity.Order update(hei.vaninah.devoir.entity.Order toUpdate) throws SQLException {
         String query = """
             update "order"
-                set "reference" = ?, 
+                set "reference" = ?,
                     "created_at" = ?, 
                     "updated_at" = ?
                 where "id" = ?
@@ -108,6 +108,7 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
         prs.setString(1, toUpdate.getReference());
         prs.setTimestamp(2, Timestamp.valueOf(toUpdate.getCreatedAt()));
         prs.setTimestamp(3, Timestamp.valueOf(toUpdate.getUpdatedAt()));
+        prs.setString(4, toUpdate.getId());
         prs.executeUpdate();
 
         orderStatusDAO.saveAll(toUpdate.getStatusHistories());

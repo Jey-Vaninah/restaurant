@@ -27,8 +27,9 @@ public class OrderService {
 
     public Order addDishOrder(String orderReference ,List<DishOrder> dishOrders){
         try {
-            dishOrderDAO.saveAll(dishOrders);
-            return dao.findByReference(orderReference);
+            Order order = dao.findByReference(orderReference);
+            order.addDishOrders(dishOrders);
+            return dao.update(order);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

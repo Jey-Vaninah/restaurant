@@ -29,8 +29,9 @@ public class DishService {
 
     public Dish addDishIngredient(String id, List<DishIngredient> dishIngredients) {
         try {
-            dishIngredientDAO.saveAll(dishIngredients);
-            return dao.findById(id);
+            Dish dish = dao.findById(id);
+            dish.addDishIngredients(dishIngredients);
+            return dao.crupdate(dish);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

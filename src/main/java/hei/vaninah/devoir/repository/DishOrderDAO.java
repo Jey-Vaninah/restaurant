@@ -66,7 +66,7 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
     @Override
     public DishOrder findById(String id) throws SQLException {
         String query = """
-            select dish_order.id, dish_order from dish_order inner join dish on dish.id = dish_order.id where id = ?;
+            select * from dish_order where id = ?;
          """;
         PreparedStatement stmt = connection.prepareStatement(query);
         stmt.setString(1, id);
@@ -100,6 +100,7 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
         prs.setString (1, toUpdate.getOrderId());
         prs.setString(2, toUpdate.getDish().getId());
         prs.setInt(3, toUpdate.getQuantity());
+        prs.setString(4, toUpdate.getId());
         prs.executeUpdate();
         this.dishOrderStatusDAO.saveAll(toUpdate.getDishOrderStatus());
         return this.findById(toUpdate.getId());

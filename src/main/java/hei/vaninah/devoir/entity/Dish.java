@@ -63,4 +63,8 @@ public class Dish {
                 .min()
                 .orElse(0);
     }
+
+    public void addDishIngredients(List<DishIngredient> dishIngredients) {
+        this.dishIngredients.addAll(dishIngredients);
+    }
 }
