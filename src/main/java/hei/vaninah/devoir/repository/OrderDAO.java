@@ -2,17 +2,12 @@ package hei.vaninah.devoir.repository;
 
 import hei.vaninah.devoir.entity.DishOrder;
 import hei.vaninah.devoir.entity.OrderStatus;
-import hei.vaninah.devoir.entity.StatusHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static hei.vaninah.devoir.entity.StatusHistory.CREATED;
 
 @Repository
 @RequiredArgsConstructor
@@ -36,58 +31,31 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
         );
     }
 
-    public hei.vaninah.devoir.entity.Order findByReference(String ref) {
+    public hei.vaninah.devoir.entity.Order findByReference(String ref) throws SQLException {
         String query = """
             select * from "order" where reference = ?;
         """;
 
-        try {
-            PreparedStatement st = connection.prepareStatement(query);
-            st.setString(1, ref);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                return resultSetToOrder(rs);
-            }
-            return null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, ref);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            return resultSetToOrder(rs);
         }
-    }
-
-    public void updateOrderStatus(String idOrder, StatusHistory newStatus) throws SQLException {
-        String query = "UPDATE order SET status = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, newStatus.name());
-            stmt.setString(2, idOrder);
-            stmt.executeUpdate();
-        }
-    }
-
-    public void addDishToOrder(hei.vaninah.devoir.entity.Order order, DishOrder dishOrder) throws SQLException {
-        if (order.isOrderConfirmed()) {
-            throw new IllegalStateException("Impossible de modifier une commande confirmée.");
-        }
-        order.checkIngredientsAvailable();
-
-        dishOrderDAO.save(dishOrder);
-    }
-
-    private boolean isOrderConfirmed(String orderId) throws SQLException {
-        String query = "select count(*) from order_status where id_order = ? and status = 'confirmed'";
-
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
+        return null;
     }
 
     @Override
-    public hei.vaninah.devoir.entity.Order findById(String id) {
+    public hei.vaninah.devoir.entity.Order findById(String id) throws SQLException {
+        String query = """
+            select * from "order" where id = ?
+        """;
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, id);
+        ResultSet rs = st.executeQuery();
+        if(rs.next()) {
+            return resultSetToOrder(rs);
+        }
         return null;
     }
 
@@ -97,58 +65,58 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
     }
 
     @Override
-    public hei.vaninah.devoir.entity.Order deleteById(String id) {
-        return null;
+    public hei.vaninah.devoir.entity.Order deleteById(String id) throws SQLException {
+        String query = """
+            delete from "order" where "id" = ?;
+        """;
+
+        hei.vaninah.devoir.entity.Order toDelete = this.findById((id));
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toDelete.getId());
+        prs.executeUpdate();
+        return toDelete;
     }
 
     @Override
-    public hei.vaninah.devoir.entity.Order save(hei.vaninah.devoir.entity.Order order) {
+    public hei.vaninah.devoir.entity.Order save(hei.vaninah.devoir.entity.Order order) throws SQLException {
         String query = """
             insert into "order" (id ,reference, updated_at, created_at) values (?, ?, ?, ?);
         """;
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, order.getId());
-            stmt.setString(2, order.getReference());
-            stmt.setTimestamp(3, Timestamp.valueOf(order.getUpdatedAt()));
-            stmt.setTimestamp(4, Timestamp.valueOf(order.getCreatedAt()));
-            stmt.executeUpdate();
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, order.getId());
+        stmt.setString(2, order.getReference());
+        stmt.setTimestamp(3, Timestamp.valueOf(order.getUpdatedAt()));
+        stmt.setTimestamp(4, Timestamp.valueOf(order.getCreatedAt()));
+        stmt.executeUpdate();
 
-            OrderStatus createdStatus = new OrderStatus(order.getId(), "O001", CREATED, order.getUpdatedAt(), order.getUpdatedAt());
-            orderStatusDAO.save(createdStatus);
-
-            for (DishOrder dishOrder : order.getDishOrders()) {
-                dishOrderDAO.save(dishOrder);
-            }
-            return this.findById(order.getId());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        orderStatusDAO.saveAll(order.getStatusHistories());
+        dishOrderDAO.saveAll(order.getDishOrders());
+        return order;
     }
 
     @Override
-    public hei.vaninah.devoir.entity.Order update(hei.vaninah.devoir.entity.Order toUpdate) {
+    public hei.vaninah.devoir.entity.Order update(hei.vaninah.devoir.entity.Order toUpdate) throws SQLException {
         String query = """
-            update "order" 
+            update "order"
                 set "reference" = ?, 
-                    "created_at" = ? , 
-                    "updated_at" = ? ,
+                    "created_at" = ?, 
+                    "updated_at" = ?
                 where "id" = ?
         """;
-        try {
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString(1, toUpdate.getReference());
-            prs.setTimestamp(2, Timestamp.valueOf(toUpdate.getCreatedAt()));
-            prs.setTimestamp(3, Timestamp.valueOf(toUpdate.getUpdatedAt()));
-            prs.executeUpdate();
-            return this.findById(toUpdate.getId());
-        } catch (SQLException error) {
-            throw new RuntimeException(error);
-        }
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString(1, toUpdate.getReference());
+        prs.setTimestamp(2, Timestamp.valueOf(toUpdate.getCreatedAt()));
+        prs.setTimestamp(3, Timestamp.valueOf(toUpdate.getUpdatedAt()));
+        prs.executeUpdate();
+
+        orderStatusDAO.saveAll(toUpdate.getStatusHistories());
+        dishOrderDAO.saveAll(toUpdate.getDishOrders());
+        return this.findById(toUpdate.getId());
     }
 
     @Override
-    public hei.vaninah.devoir.entity.Order crupdate(hei.vaninah.devoir.entity.Order crupdateOrder) {
+    public hei.vaninah.devoir.entity.Order crupdate(hei.vaninah.devoir.entity.Order crupdateOrder) throws SQLException {
         final boolean isCreate = this.findById(crupdateOrder.getId()) == null;
         if (isCreate) {
             return this.save(crupdateOrder);
@@ -159,17 +127,5 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
     @Override
     public List<hei.vaninah.devoir.entity.Order> saveAll(List<hei.vaninah.devoir.entity.Order> list) {
         return List.of();
-    }
-
-    public long getDishProcessingTime(String dishOrderId, LocalDateTime startDate, LocalDateTime endDate, String timeUnit, String durationType) {
-        long durationInSeconds = Duration.between(startDate, endDate).getSeconds();
-        switch (timeUnit) {
-            case "minutes":
-                return durationInSeconds / 60;
-            case "hours":
-                return durationInSeconds / 3600;
-            default:
-                return durationInSeconds;
-        }
     }
 }

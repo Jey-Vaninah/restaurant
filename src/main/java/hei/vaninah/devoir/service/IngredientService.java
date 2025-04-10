@@ -7,6 +7,7 @@ import hei.vaninah.devoir.repository.Pagination;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +21,12 @@ public class IngredientService {
     }
 
     public List<Ingredient> getIngredientsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pagination pagination, Order order) {
-        List<Ingredient> allIngredients = dao.findAll(pagination, order);
+        List<Ingredient> allIngredients;
+        try {
+            allIngredients = dao.findAll(pagination, order);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         return allIngredients.stream()
              .filter(ingredient -> {
@@ -32,18 +38,34 @@ public class IngredientService {
     }
 
     public Optional<Ingredient> getIngredientById(String id) {
-        return Optional.ofNullable(dao.findById(id));
+        try {
+            return Optional.ofNullable(dao.findById(id));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Ingredient> addIngredients(List<Ingredient> ingredients) {
-        return dao.saveAll(ingredients);
+        try {
+            return dao.saveAll(ingredients);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Ingredient> updateIngredients(List<Ingredient> ingredients) {
-        return dao.saveAll(ingredients);
+        try {
+            return dao.saveAll(ingredients);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Ingredient deleteIngredient(String id) {
-        return dao.deleteById(id);
+        try {
+            return dao.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

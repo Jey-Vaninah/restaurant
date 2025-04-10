@@ -8,6 +8,8 @@ import hei.vaninah.devoir.repository.OrderDAO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
+
 @Component
 @AllArgsConstructor
 public class DishOrderMapper {
@@ -27,22 +29,30 @@ public class DishOrderMapper {
     }
 
     public hei.vaninah.devoir.entity.DishOrder createToDomain(String reference, CreateDishOrder createDishOrder) {
-        return new hei.vaninah.devoir.entity.DishOrder(
-            createDishOrder.getId(),
-            orderDAO.findByReference(reference).getId(),
-            dishDAO.findById(createDishOrder.getDishId()),
-            createDishOrder.getQuantity(),
-            dishOrderStatusDAO.findByDishOrderId(createDishOrder.getId())
-        );
+        try {
+            return new hei.vaninah.devoir.entity.DishOrder(
+                createDishOrder.getId(),
+                orderDAO.findByReference(reference).getId(),
+                dishDAO.findById(createDishOrder.getDishId()),
+                createDishOrder.getQuantity(),
+                dishOrderStatusDAO.findByDishOrderId(createDishOrder.getId())
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public hei.vaninah.devoir.entity.DishOrder updateToDomain(String reference,DishOrder dishOrder) {
-        return new hei.vaninah.devoir.entity.DishOrder(
-            dishOrder.getId(),
-            dishOrder.getOrderId(),
-            dishDAO.findById(dishOrder.getDish().getId()),
-            dishOrder.getQuantity(),
-            dishOrderStatusDAO.findByDishOrderId(dishOrder.getId())
-        );
+        try {
+            return new hei.vaninah.devoir.entity.DishOrder(
+                dishOrder.getId(),
+                dishOrder.getOrderId(),
+                dishDAO.findById(dishOrder.getDish().getId()),
+                dishOrder.getQuantity(),
+                dishOrderStatusDAO.findByDishOrderId(dishOrder.getId())
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

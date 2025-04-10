@@ -10,8 +10,8 @@ import hei.vaninah.devoir.repository.Pagination;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Data
@@ -20,27 +20,19 @@ public class DishService {
     private final DishIngredientDAO dishIngredientDAO;
 
     public List<Dish> getAll(){
-        return dao.findAll(new Pagination(1, 500), new Order("name", Order.OrderValue.ASC));
-    }
-
-    public Optional<Dish> getDishById(String id) {
-        return Optional.ofNullable(dao.findById(id));
-    }
-
-    public List<Dish> addIngredients(List<Dish> dishes) {
-        return dao.saveAll(dishes);
-    }
-
-    public List<Dish> updateIngredients(List<Dish> dishes) {
-        return dao.saveAll(dishes);
-    }
-
-    public Dish deleteDish(String id) {
-        return dao.deleteById(id);
+        try {
+            return dao.findAll(new Pagination(1, 500), new Order("name", Order.OrderValue.ASC));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Dish addDishIngredient(String id, List<DishIngredient> dishIngredients) {
-        dishIngredientDAO.saveAll(dishIngredients);
-        return dao.findById(id);
+        try {
+            dishIngredientDAO.saveAll(dishIngredients);
+            return dao.findById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

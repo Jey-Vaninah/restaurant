@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -42,13 +41,13 @@ public class OrderController {
                 dishOrders.stream().map(dishOrder -> dishOrderMapper.createToDomain(reference, dishOrder)).toList()
             )
         );
-    };
+    }
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")
     public Order updateDishStatus(
         @PathVariable("reference") String reference,
         @PathVariable("dishId") String dishId,
-        @RequestBody DishOrderStatus updateRequest) throws SQLException {
+        @RequestBody DishOrderStatus updateRequest) {
 
         return orderMapper.toRest(
             orderService.updateDishOrderStatus(

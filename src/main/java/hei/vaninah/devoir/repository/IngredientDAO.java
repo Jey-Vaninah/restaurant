@@ -35,81 +35,70 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
     }
 
     @Override
-    public Ingredient findById(String id) {
-        String query = "select * from \"ingredient\" where \"id\" = ?";
-        try{
-            PreparedStatement st = connection.prepareStatement(query);
-            st.setString(1, id);
-            ResultSet rs = st.executeQuery();
-            if(rs.next()) {
-                return resultSetToIngredient(rs);
-            }
-            return null;
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+    public Ingredient findById(String id) throws SQLException {
+        String query = """
+            select * from "ingredient" where "id" = ?
+        """;
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setString(1, id);
+        ResultSet rs = st.executeQuery();
+        if(rs.next()) {
+            return resultSetToIngredient(rs);
         }
+        return null;
     }
 
     @Override
-    public List<Ingredient> findAll(Pagination pagination, Order order){
+    public List<Ingredient> findAll(Pagination pagination, Order order) throws SQLException {
         StringBuilder query = new StringBuilder("select * from \"ingredient\"");
         query.append(" order by ").append(order.getOrderBy()).append(" ").append(order.getOrderValue());
         query.append(" limit ? offset ?");
 
         List<Ingredient> ingredients = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
-            preparedStatement.setInt(1, pagination.getPageSize());
-            preparedStatement.setInt(2, (pagination.getPage() - 1) * pagination.getPageSize());
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                ingredients.add(resultSetToIngredient(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+        preparedStatement.setInt(1, pagination.getPageSize());
+        preparedStatement.setInt(2, (pagination.getPage() - 1) * pagination.getPageSize());
+        ResultSet rs = preparedStatement.executeQuery();
+        while(rs.next()){
+            ingredients.add(resultSetToIngredient(rs));
         }
         return ingredients;
     }
 
     @Override
-    public Ingredient deleteById(String id) {
+    public Ingredient deleteById(String id) throws SQLException {
         String query = """
             delete from "ingredient" where "id" = ?;
         """;
 
-        try{
-            final Ingredient toDelete = this.findById((id));
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString (1, toDelete.getId());
-            prs.executeUpdate();
-            return toDelete;
-        }catch (SQLException error){
-            throw new RuntimeException(error);
-        }
+        Ingredient toDelete = this.findById((id));
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toDelete.getId());
+        prs.executeUpdate();
+        return toDelete;
     }
 
     @Override
-    public Ingredient save(Ingredient toCreate) {
+    public Ingredient save(Ingredient toCreate) throws SQLException {
         String query = """
             insert into "ingredient"("id", "name", "update_datetime", "unit_price", "unit")
             values (?, ?, ?, ?, ?);
          """;
-        try{
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString (1, toCreate.getId());
-            prs.setString (2, toCreate.getName());
-            prs.setTimestamp(3, Timestamp.valueOf(toCreate.getUpdateDatetime()));
-            prs.setBigDecimal (4, toCreate.getUnitPrice());
-            prs.setObject(5, toCreate.getUnit(), Types.OTHER);
-            prs.executeUpdate();
-            return this.findById(toCreate.getId());
-        }catch (SQLException error){
-            throw new RuntimeException(error);
-        }
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toCreate.getId());
+        prs.setString (2, toCreate.getName());
+        prs.setTimestamp(3, Timestamp.valueOf(toCreate.getUpdateDatetime()));
+        prs.setBigDecimal (4, toCreate.getUnitPrice());
+        prs.setObject(5, toCreate.getUnit(), Types.OTHER);
+        prs.executeUpdate();
+
+        this.ingredientStockMovementDAO.saveAll(toCreate.getIngredientStockMovements());
+        this.priceHistoryDAO.saveAll(toCreate.getPriceHistories());
+        return this.findById(toCreate.getId());
     }
 
     @Override
-    public Ingredient update(Ingredient toUpdate) {
+    public Ingredient update(Ingredient toUpdate) throws SQLException {
         String query = """
             update "ingredient"
                 set "name" = ? ,
@@ -118,22 +107,21 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
                     "unit" = ?
                 where "id" = ?
         """;
-        try{
-            PreparedStatement prs = connection.prepareStatement(query);
-            prs.setString (1, toUpdate.getName());
-            prs.setTimestamp(2, Timestamp.valueOf(toUpdate.getUpdateDatetime()));
-            prs.setBigDecimal(3, toUpdate.getUnitPrice());
-            prs.setObject(4, toUpdate.getUnit(), Types.OTHER);
-            prs.setString (5, toUpdate.getId());
-            prs.executeUpdate();
-            return this.findById(toUpdate.getId());
-        }catch (SQLException error){
-            throw new RuntimeException(error);
-        }
+        PreparedStatement prs = connection.prepareStatement(query);
+        prs.setString (1, toUpdate.getName());
+        prs.setTimestamp(2, Timestamp.valueOf(toUpdate.getUpdateDatetime()));
+        prs.setBigDecimal(3, toUpdate.getUnitPrice());
+        prs.setObject(4, toUpdate.getUnit(), Types.OTHER);
+        prs.setString (5, toUpdate.getId());
+        prs.executeUpdate();
+
+        this.ingredientStockMovementDAO.saveAll(toUpdate.getIngredientStockMovements());
+        this.priceHistoryDAO.saveAll(toUpdate.getPriceHistories());
+        return this.findById(toUpdate.getId());
     }
 
     @Override
-    public Ingredient crupdate(Ingredient crupdateIngredient) {
+    public Ingredient crupdate(Ingredient crupdateIngredient) throws SQLException {
         final boolean isCreate = this.findById(crupdateIngredient.getId()) == null;
         if(isCreate) {
             return this.save(crupdateIngredient);
@@ -142,7 +130,7 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
     }
 
     @Override
-    public List<Ingredient> saveAll(List<Ingredient> list) {
+    public List<Ingredient> saveAll(List<Ingredient> list) throws SQLException {
         for(Ingredient ingredient : list) {
             this.crupdate(ingredient);
         }
@@ -150,7 +138,7 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
         return list;
     }
 
-    public List<Ingredient> findByDishId(String dishId){
+    public List<Ingredient> findByDishId(String dishId) throws SQLException {
         List<Ingredient> ingredients = new ArrayList<>();
         String query = """
             select "ingredient".*
@@ -160,15 +148,11 @@ public class IngredientDAO implements RestaurantManagementDAO<Ingredient> {
                 where "dish_ingredient"."id_dish" = ?
                 order by "ingredient"."name" asc;
         """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, dishId);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                ingredients.add(resultSetToIngredient(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishId);
+        ResultSet rs = preparedStatement.executeQuery();
+        while(rs.next()){
+            ingredients.add(resultSetToIngredient(rs));
         }
         return ingredients;
     }

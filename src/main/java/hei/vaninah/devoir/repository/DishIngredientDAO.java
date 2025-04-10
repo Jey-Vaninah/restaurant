@@ -23,23 +23,19 @@ public class DishIngredientDAO implements RestaurantManagementDAO<DishIngredient
         );
     }
 
-    public List<DishIngredient> findByDishId(String dishId){
+    public List<DishIngredient> findByDishId(String dishId) throws SQLException {
         List<DishIngredient> dishIngredients = new ArrayList<>();
-
         String query = """
             select * from "dish_ingredient"
-                where "dish_ingredient"."id_dish" = ?
-                order by "dish_ingredient"."id_ingredient" asc;
+            where "dish_ingredient"."id_dish" = ?
+            order by "dish_ingredient"."id_ingredient";
         """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, dishId);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                dishIngredients.add(resultSetToDishIngredient(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishId);
+        ResultSet rs = preparedStatement.executeQuery();
+        while(rs.next()){
+            dishIngredients.add(resultSetToDishIngredient(rs));
         }
         return dishIngredients;
     }
@@ -49,58 +45,62 @@ public class DishIngredientDAO implements RestaurantManagementDAO<DishIngredient
         throw new RuntimeException("Not Implemented");
     }
 
+    public DishIngredient findByDishIdAndIngredientId(String dishId, String ingredientId) throws SQLException {
+        String query = "select * from dish_ingredient where id_dish = ? and id_ingredient = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishId);
+        preparedStatement.setString(2, ingredientId);
+        ResultSet rs = preparedStatement.executeQuery();
+        if(rs.next()){
+            return resultSetToDishIngredient(rs);
+        }
+        return null;
+    }
+
     @Override
-    public List<DishIngredient> findAll(Pagination pagination, Order order) {
+    public List<DishIngredient> findAll(Pagination pagination, Order order) throws SQLException {
         throw new RuntimeException("Not Implemented");
     }
 
     @Override
-    public DishIngredient deleteById(String id) {
+    public DishIngredient deleteById(String id) throws SQLException {
         throw new RuntimeException("Not Implemented");
     }
 
     @Override
-    public DishIngredient save(DishIngredient dishIngredient) {
+    public DishIngredient save(DishIngredient dishIngredient) throws SQLException {
         String query = """
             insert into "dish_ingredient"("id_dish", "id_ingredient", "required_quantity", "unit")
             values (?, ?, ?, ?);
         """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, dishIngredient.getIdDish());
-            preparedStatement.setString(2, dishIngredient.getIdIngredient());
-            preparedStatement.setFloat(3, dishIngredient.getRequiredQuantity());
-            preparedStatement.setObject(4, dishIngredient.getUnit(), Types.OTHER);
-            preparedStatement.executeUpdate();
-            return dishIngredient;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishIngredient.getIdDish());
+        preparedStatement.setString(2, dishIngredient.getIdIngredient());
+        preparedStatement.setFloat(3, dishIngredient.getRequiredQuantity());
+        preparedStatement.setObject(4, dishIngredient.getUnit(), Types.OTHER);
+        preparedStatement.executeUpdate();
+        return dishIngredient;
     }
 
     @Override
-    public DishIngredient update(DishIngredient dishIngredient) {
+    public DishIngredient update(DishIngredient dishIngredient) throws SQLException {
         String query = """
             update "dish_ingredient"
             set "required_quantity" = ?, "unit" = ?
             where "id_dish" = ? and "id_ingredient" = ?;
         """;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setFloat(1, dishIngredient.getRequiredQuantity());
-            preparedStatement.setObject(2, dishIngredient.getUnit(), Types.OTHER);
-            preparedStatement.setString(3, dishIngredient.getIdDish());
-            preparedStatement.setString(4, dishIngredient.getIdIngredient());
-            preparedStatement.executeUpdate();
-            return dishIngredient;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setFloat(1, dishIngredient.getRequiredQuantity());
+        preparedStatement.setObject(2, dishIngredient.getUnit(), Types.OTHER);
+        preparedStatement.setString(3, dishIngredient.getIdDish());
+        preparedStatement.setString(4, dishIngredient.getIdIngredient());
+        preparedStatement.executeUpdate();
+        return dishIngredient;
     }
 
     @Override
-    public DishIngredient crupdate(DishIngredient dishIngredient) {
-        if (findByDishId(dishIngredient.getIdDish()).stream().anyMatch(di -> di.getIdIngredient().equals(dishIngredient.getIdIngredient()))) {
+    public DishIngredient crupdate(DishIngredient dishIngredient) throws SQLException {
+        if (findByDishIdAndIngredientId(dishIngredient.getIdDish(), dishIngredient.getIdIngredient()) != null) {
             return update(dishIngredient);
         } else {
             return save(dishIngredient);
@@ -108,7 +108,7 @@ public class DishIngredientDAO implements RestaurantManagementDAO<DishIngredient
     }
 
     @Override
-    public List<DishIngredient> saveAll(List<DishIngredient> list) {
+    public List<DishIngredient> saveAll(List<DishIngredient> list) throws SQLException {
         for (DishIngredient dishIngredient : list) {
             crupdate(dishIngredient);
         }

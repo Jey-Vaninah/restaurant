@@ -27,7 +27,7 @@ public class OrderStatusDAO implements RestaurantManagementDAO<OrderStatus> {
     public List<OrderStatus> findByOrderId(String orderId) throws SQLException {
         List<OrderStatus> orderStatuses = new ArrayList<>();
         String query = """
-            select * from "order_status" where id_order = ? order by id;
+            select * from "order_status" where id_order = ? order by updated_at desc;
         """;
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);

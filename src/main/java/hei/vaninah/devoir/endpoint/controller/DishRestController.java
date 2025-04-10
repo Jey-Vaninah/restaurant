@@ -5,18 +5,14 @@ import hei.vaninah.devoir.endpoint.mapper.DishMapper;
 import hei.vaninah.devoir.endpoint.rest.DishIngredient;
 import hei.vaninah.devoir.endpoint.rest.Dish;
 import hei.vaninah.devoir.service.DishService;
-import hei.vaninah.devoir.service.OrderService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
 public class DishRestController {
-    private final OrderService orderService;
     private DishService dishService;
     private DishMapper dishMapper;
     private DishIngredientMapper dishIngredientMapper;
@@ -32,17 +28,5 @@ public class DishRestController {
             id,
             ingredients.stream().map(ingredient -> dishIngredientMapper.toDomain(id, ingredient)).toList()
         ));
-    }
-
-    @GetMapping("/{dishId}/processingTime")
-    public ResponseEntity<Long> getProcessingTime(
-            @PathVariable String dishId,
-            @RequestParam LocalDateTime dateDebut,
-            @RequestParam LocalDateTime dateFin,
-            @RequestParam(defaultValue = "seconds") String timeUnit,
-            @RequestParam(defaultValue = "MOYEN") String aggregationType) {
-
-        long processingTime = orderService.getProcessingTime(dishId, dateDebut, dateFin, timeUnit, aggregationType);
-        return ResponseEntity.ok(processingTime);
     }
 }
