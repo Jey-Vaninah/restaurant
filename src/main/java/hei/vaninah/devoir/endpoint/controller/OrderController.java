@@ -1,14 +1,13 @@
 package hei.vaninah.devoir.endpoint.controller;
 
 import hei.vaninah.devoir.endpoint.mapper.DishOrderMapper;
+import hei.vaninah.devoir.endpoint.mapper.DishOrderStatusMapper;
 import hei.vaninah.devoir.endpoint.mapper.OrderMapper;
 import hei.vaninah.devoir.endpoint.rest.CreateDishOrder;
-import hei.vaninah.devoir.endpoint.rest.DishOrder;
 import hei.vaninah.devoir.endpoint.rest.Order;
-import hei.vaninah.devoir.entity.IngredientStockMovement;
+import hei.vaninah.devoir.endpoint.rest.DishOrderStatus;
 import hei.vaninah.devoir.service.OrderService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +19,7 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
     private final DishOrderMapper dishOrderMapper;
+    private final DishOrderStatusMapper dishOrderStatusMapper;
 
     @GetMapping("/orders/{reference}")
     public ResponseEntity<Order> findByReference(@PathVariable("reference") String reference) {
@@ -45,15 +45,15 @@ public class OrderController {
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")
     public Order updateDishStatus(
-            @PathVariable("reference")String reference,
-            @PathVariable("dishId") String dishId,
-            @RequestBody DishOrder dishOrder) {
+        @PathVariable("reference") String reference,
+        @PathVariable("dishId") String dishId,
+        @RequestBody DishOrderStatus updateRequest) {
+
         return orderMapper.toRest(
-                orderService.updateDishStatus(
-                        reference,
-                        dishOrderMapper.updateToDomain(reference,dishOrder)
-                )
+            orderService.updateDishOrderStatus(
+                reference,
+                dishOrderStatusMapper.toDomain(reference, dishId, updateRequest)
+            )
         );
     }
-
 }

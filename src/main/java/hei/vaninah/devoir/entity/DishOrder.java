@@ -3,6 +3,7 @@ package hei.vaninah.devoir.entity;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,5 +48,9 @@ public class DishOrder {
 
         this.dishOrderStatus.add(status);
         return status;
+    }
+
+    public String getOrder() {
+        return this.orderId;
     }
 }

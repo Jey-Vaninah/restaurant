@@ -5,5 +5,5 @@ public enum StatusHistory {
     CONFIRMED,
     IN_PREPARATION,
     COMPLETED,
-    SERVED
+    SERVED;
 }

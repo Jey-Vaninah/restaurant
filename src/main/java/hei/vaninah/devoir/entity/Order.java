@@ -1,13 +1,18 @@
 package hei.vaninah.devoir.entity;
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static hei.vaninah.devoir.entity.StatusHistory.*;
 import static java.time.LocalDateTime.now;
@@ -25,17 +30,6 @@ public class Order {
     private LocalDateTime updatedAt;
     private ArrayList<DishOrder> dishOrders;
     private ArrayList<OrderStatus> statusHistories;
-
-//    public Order() {
-//        this.id = randomUUID().toString();
-//        this.reference = randomUUID().toString();
-//        this.updatedAt = now();
-//        this.createdAt = now();
-//        this.dishOrders = new ArrayList<>();
-//        this.statusHistories = new ArrayList<>(List.of(
-//            new OrderStatus(randomUUID().toString(), this.id, CREATED, now(), now())
-//        ));
-//    }
 
     public void confirm(){
         this.checkIngredientsAvailable();
@@ -155,6 +149,4 @@ public class Order {
         List<OrderStatus> orderStatuses = this.getStatusHistories().stream().filter(status -> status.getStatus().equals(CONFIRMED)).toList();
         return orderStatuses.size() > 0;
     }
-
-
 }

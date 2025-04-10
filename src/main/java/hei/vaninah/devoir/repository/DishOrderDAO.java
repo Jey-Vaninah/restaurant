@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +74,8 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
     @Override
     public DishOrder findById(String id) {
         String query = """
-            SELECT dish_order.id, dish_order. FROM dish_order inner join dish on dish.id = dish_order.id WHERE id = ?";
+            SELECT dish_order.id, dish_order. FROM dish_order inner join dish on dish.id = dish_order.id WHERE id = ?;
+
          """;
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, id);
@@ -131,4 +133,32 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
     public List<DishOrder> saveAll(List<DishOrder> list) {
         return List.of();
     }
+
+    public List<DishOrder> findByDishIdAndOrderDateRange(String dishId, LocalDateTime dateDebut, LocalDateTime dateFin) {
+        List<DishOrder> dishOrders = new ArrayList<>();
+        String query = """
+        SELECT dish_order.id, dish_order.id_order, dish_order.id_dish, dish_order.quantity
+        FROM dish_order
+        JOIN "order" ON dish_order.id_order = "order".id
+        WHERE dish_order.id_dish = ? 
+        AND "order".order_date BETWEEN ? AND ?
+        ORDER BY dish_order.id;
+    """;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, dishId);
+            preparedStatement.setObject(2, dateDebut);
+            preparedStatement.setObject(3, dateFin);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                dishOrders.add(resultSetToDishOrder(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching DishOrders by dishId and date range: " + e.getMessage(), e);
+        }
+
+        return dishOrders;
+    }
+
 }

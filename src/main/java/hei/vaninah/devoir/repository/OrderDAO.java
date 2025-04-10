@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,4 +161,21 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
     public List<hei.vaninah.devoir.entity.Order> saveAll(List<hei.vaninah.devoir.entity.Order> list) {
         return List.of();
     }
+
+    public long getDishProcessingTime(String dishOrderId, LocalDateTime startDate, LocalDateTime endDate, String timeUnit, String durationType) {
+        // Vous pouvez ici ajouter la logique de calcul de la durée, en fonction des dates et de l'unité de temps.
+        // Exemple simple : retourner la différence en secondes.
+        long durationInSeconds = Duration.between(startDate, endDate).getSeconds();
+
+        // Ajuster la durée selon l'unité et le type de durée, par exemple convertir en minutes ou heures selon le cas.
+        switch (timeUnit) {
+            case "minutes":
+                return durationInSeconds / 60;
+            case "hours":
+                return durationInSeconds / 3600;
+            default:
+                return durationInSeconds;
+        }
+    }
+
 }

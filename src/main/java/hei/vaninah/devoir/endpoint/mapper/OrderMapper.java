@@ -1,6 +1,5 @@
 package hei.vaninah.devoir.endpoint.mapper;
 
-import hei.vaninah.devoir.endpoint.rest.DishOrder;
 import hei.vaninah.devoir.endpoint.rest.Order;
 import hei.vaninah.devoir.repository.DishDAO;
 import hei.vaninah.devoir.repository.DishOrderStatusDAO;
@@ -25,3 +24,4 @@ public class OrderMapper {
         );
     }
 }
+

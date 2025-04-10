@@ -275,8 +275,6 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
                   $ref: '#/components/schemas/Order'
 
   /orders/{reference}/dishes:
@@ -305,8 +303,6 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
                   $ref: '#/components/schemas/Order'
 
   /orders/{reference}/dishes/{dishId}:

@@ -2,14 +2,11 @@ package hei.vaninah.devoir.endpoint.mapper;
 
 import hei.vaninah.devoir.endpoint.rest.CreateDishOrder;
 import hei.vaninah.devoir.endpoint.rest.DishOrder;
-import hei.vaninah.devoir.entity.DishOrderStatus;
 import hei.vaninah.devoir.repository.DishDAO;
 import hei.vaninah.devoir.repository.DishOrderStatusDAO;
 import hei.vaninah.devoir.repository.OrderDAO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -41,11 +38,11 @@ public class DishOrderMapper {
 
     public hei.vaninah.devoir.entity.DishOrder updateToDomain(String reference,DishOrder dishOrder) {
         return new hei.vaninah.devoir.entity.DishOrder(
-                dishOrder.getId(),
-                dishOrder.getOrderId(),
-                dishDAO.findById(dishOrder.getDish().getId()),
-                dishOrder.getQuantity(),
-                dishOrderStatusDAO.findByDishOrderId(dishOrder.getId()) //enfait je pense oe tokon actuelStatus ty
+            dishOrder.getId(),
+            dishOrder.getOrderId(),
+            dishDAO.findById(dishOrder.getDish().getId()),
+            dishOrder.getQuantity(),
+            dishOrderStatusDAO.findByDishOrderId(dishOrder.getId())
         );
     }
 }
