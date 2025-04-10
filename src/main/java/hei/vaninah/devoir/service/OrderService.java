@@ -37,6 +37,7 @@ public class OrderService {
 
     public Order updateDishOrderStatus(String orderReference, DishOrderStatus dishOrderStatus) {
         try {
+             dao.findByReference(orderReference);
             dishOrderStatusDAO.save(dishOrderStatus);
             return dao.findByReference(orderReference);
         } catch (SQLException e) {

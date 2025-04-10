@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,22 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
             new ArrayList<>(dishOrders),
             new ArrayList<>(orderStatuses)
         );
+    }
+
+    public List<hei.vaninah.devoir.entity.Order> findAllInRange(LocalDateTime from, LocalDateTime to) throws SQLException {
+        String query = """
+            select * FROM "order"
+            where "created_at" between ? and ?
+        """;
+        List<hei.vaninah.devoir.entity.Order> orders = new ArrayList<>();
+        PreparedStatement st = connection.prepareStatement(query);
+        st.setTimestamp(1, Timestamp.valueOf(from));
+        st.setTimestamp(2, Timestamp.valueOf(from));
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            orders.add(resultSetToOrder(rs));
+        }
+        return orders;
     }
 
     public hei.vaninah.devoir.entity.Order findByReference(String ref) throws SQLException {

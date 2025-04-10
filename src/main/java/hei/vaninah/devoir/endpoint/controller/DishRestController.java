@@ -2,12 +2,14 @@ package hei.vaninah.devoir.endpoint.controller;
 
 import hei.vaninah.devoir.endpoint.mapper.DishIngredientMapper;
 import hei.vaninah.devoir.endpoint.mapper.DishMapper;
+import hei.vaninah.devoir.endpoint.rest.BestSales;
 import hei.vaninah.devoir.endpoint.rest.DishIngredient;
 import hei.vaninah.devoir.endpoint.rest.Dish;
 import hei.vaninah.devoir.service.DishService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,5 +30,10 @@ public class DishRestController {
             id,
             ingredients.stream().map(ingredient -> dishIngredientMapper.toDomain(id, ingredient)).toList()
         ));
+    }
+
+    @GetMapping("/bestSales")
+    public List<BestSales> getBestSales(@RequestParam Integer limit, @RequestParam LocalDateTime from, @RequestParam LocalDateTime to) {
+        return dishService.findBestSales(limit, from, to);
     }
 }
