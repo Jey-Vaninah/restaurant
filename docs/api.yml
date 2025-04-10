@@ -234,7 +234,7 @@ paths:
       summary: Add or update ingredients for a dish
       operationId: updateDishes
       parameters:
-        - name: dishId
+        - name: id
           in: path
           required: true
           schema:
@@ -329,7 +329,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/DishOrder'
+                $ref: '#/components/schemas/ActualStatus'
       responses:
         '200':
           description: Updated orders
@@ -338,7 +338,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DishOrder'
+                  $ref: '#/components/schemas/Order'
 
 components:
   schemas:
@@ -349,22 +349,20 @@ components:
           type: string
         name:
           type: string
+        unitPrice:
+          type: number
+          format: big decimal
         updateDatetime:
           type: string
           format: date-time
-        unitPrice:
-          type: number
-          format: double
         unit:
-          type: string
-        priceHistories:
-          type: array
-          items:
-            $ref: '#/components/schemas/PriceHistory'
-        ingredientStockMovements:
-          type: array
-          items:
-            $ref: '#/components/schemas/IngredientStockMovement'
+          $ref: '#/components/schemas/Unit'
+        currentPrice:
+          type: number
+          format: big decimal
+        currentStock:
+          type: number
+          format: float
 
     PriceHistory:
       type: object
@@ -378,7 +376,7 @@ components:
           format: date-time
         unitPrice:
           type: number
-          format: double
+          format: big decimal
 
     IngredientStockMovement:
       type: object
@@ -394,9 +392,15 @@ components:
           type: string
           format: date-time
         movementType:
-          type: string
+          $ref: '#/components/schemas/IngredientStockMovementType'
         unit:
-          type: string
+          $ref: '#/components/schemas/Unit'
+
+    IngredientStockMovementType:
+      type: string
+      enum:
+        - IN
+        - OUT
 
     Dish:
       type: object
@@ -407,13 +411,13 @@ components:
           type: string
         availableQuantity:
           type: integer
-        price:
-          type: number
-          format: big decimal
         ingredient:
           type: array
           items:
             $ref: '#/components/schemas/Ingredient'
+        unitPrice:
+          type: number
+          format: big decimal
 
     DishIngredient:
       type: object
@@ -442,7 +446,7 @@ components:
         - COMPLETED
         - SERVED
 
-    DishOrderStatus:
+    ActualStatus:
       type: object
       properties:
         id:
@@ -469,22 +473,22 @@ components:
           $ref: '#/components/schemas/Dish'
         quantity:
           type: integer
-        dishOrderStatus:
-          $ref: '#/components/schemas/DishOrderStatus'
+        actualStatus:
+          $ref: '#/components/schemas/ActualStatus'
 
     OrderStatus:
       type: object
       properties:
         id:
           type: string
-        orderId:
+        idOrder:
           type: string
         status:
           $ref: '#/components/schemas/StatusHistory'
-        createdAt:
+        updatedAt:
           type: string
           format: date-time
-        updatedAt:
+        createdAt:
           type: string
           format: date-time
 
@@ -498,12 +502,12 @@ components:
         createAt:
           type: string
           format: date-time
-        updated:
-          $ref: '#/components/schemas/OrderStatus'
-        orderStatus:
-          type: number
-          format: big decimal
-        dishOrder:
+        updatedAt:
+          type: string
+          format: date-time
+        actualStatus:
+          $ref: '#/components/schemas/StatusHistory'
+        dishOrders:
           type: array
           items:
             $ref: '#/components/schemas/DishOrder'
@@ -517,5 +521,5 @@ components:
           type: string
         quantity:
           type: integer
-        status:
+        actualStatus:
           $ref: '#/components/schemas/StatusHistory'
