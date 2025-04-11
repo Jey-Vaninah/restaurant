@@ -4,6 +4,21 @@ insert into dish_order (id,id_order, id_dish, quantity) values
 insert into dish_order (id,id_order, id_dish, quantity) values
     ('DO002','O001','D002', 2);
 
+insert into dish_order (id,id_order, id_dish, quantity) values
+    ('DO005','O002','D002', 10);
+
+insert into dish_order (id,id_order, id_dish, quantity) values
+    ('DO006','O003','D001', 4);
+
+insert into dish_order (id,id_order, id_dish, quantity) values
+    ('DO007','O004','D001', 4);
+
+insert into dish_order (id,id_order, id_dish, quantity) values
+    ('DO008','O005','D001', 4);
+
+insert into dish_order (id,id_order, id_dish, quantity) values
+    ('DO009','O006','D001', 20);
+
 
 
 
