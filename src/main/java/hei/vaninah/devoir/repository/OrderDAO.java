@@ -40,7 +40,7 @@ public class OrderDAO implements RestaurantManagementDAO<hei.vaninah.devoir.enti
         List<hei.vaninah.devoir.entity.Order> orders = new ArrayList<>();
         PreparedStatement st = connection.prepareStatement(query);
         st.setTimestamp(1, Timestamp.valueOf(from));
-        st.setTimestamp(2, Timestamp.valueOf(from));
+        st.setTimestamp(2, Timestamp.valueOf(to));
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
             orders.add(resultSetToOrder(rs));
