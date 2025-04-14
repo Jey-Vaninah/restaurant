@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProcessingTime {
-    private Long value;
+    private Double value;
     ProcessingTimeType unit;
 }

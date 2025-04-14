@@ -85,11 +85,11 @@ public class DishService {
         try {
             List<Duration> durations = this.getDurationsByDishId(dishId);
             if (durations.isEmpty()) {
-                return new ProcessingTime(0L, timeType);
+                return new ProcessingTime(0D, timeType);
             }
 
-            long processingTime = this.computeAggregateDuration(durations, valueType);
-            long convertedProcessingTime = this.convertDuration(processingTime, timeType);
+            double processingTime = this.computeAggregateDuration(durations, valueType);
+            double convertedProcessingTime = this.convertDuration(processingTime, timeType);
 
             return new ProcessingTime(convertedProcessingTime, timeType);
         } catch (SQLException e) {
@@ -114,7 +114,7 @@ public class DishService {
     }
 
 
-    private long computeAggregateDuration(List<Duration> durations, ProcessingValueType type) {
+    private double computeAggregateDuration(List<Duration> durations, ProcessingValueType type) {
         return switch (type) {
             case MINIMUM -> durations.stream()
                 .mapToLong(Duration::getSeconds)
@@ -124,19 +124,18 @@ public class DishService {
                 .mapToLong(Duration::getSeconds)
                 .max()
                 .orElse(0);
-            case AVERAGE -> (long) durations.stream()
+            case AVERAGE -> (double) durations.stream()
                 .mapToLong(Duration::getSeconds)
                 .average()
                 .orElse(0);
         };
     }
 
-    private long convertDuration(long durationTime, ProcessingTimeType unit) {
-        Duration duration = Duration.ofSeconds(durationTime);
+    private double convertDuration(double durationTime, ProcessingTimeType unit) {
         return switch (unit) {
-            case SECONDS -> duration.getSeconds();
-            case MINUTES -> duration.toMinutes();
-            case HOURS  -> duration.toHours();
+            case SECONDS -> durationTime;
+            case MINUTES -> durationTime / 60;
+            case HOURS   -> durationTime / 3600;
         };
     }
 }
