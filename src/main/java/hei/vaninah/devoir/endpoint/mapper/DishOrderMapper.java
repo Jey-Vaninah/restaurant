@@ -2,6 +2,7 @@ package hei.vaninah.devoir.endpoint.mapper;
 
 import hei.vaninah.devoir.endpoint.rest.CreateDishOrder;
 import hei.vaninah.devoir.endpoint.rest.DishOrder;
+import hei.vaninah.devoir.entity.DishOrderStatus;
 import hei.vaninah.devoir.repository.DishDAO;
 import hei.vaninah.devoir.repository.DishOrderStatusDAO;
 import hei.vaninah.devoir.repository.OrderDAO;
@@ -9,6 +10,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static hei.vaninah.devoir.entity.StatusHistory.CREATED;
+import static java.util.UUID.randomUUID;
 
 @Component
 @AllArgsConstructor
@@ -35,7 +41,13 @@ public class DishOrderMapper {
                 orderDAO.findByReference(reference).getId(),
                 dishDAO.findById(createDishOrder.getDishId()),
                 createDishOrder.getQuantity(),
-                dishOrderStatusDAO.findByDishOrderId(createDishOrder.getId())
+                List.of(new DishOrderStatus(
+                    randomUUID().toString(),
+                    createDishOrder.getId(),
+                    CREATED,
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
+                ))
             );
         } catch (SQLException e) {
             throw new RuntimeException(e);

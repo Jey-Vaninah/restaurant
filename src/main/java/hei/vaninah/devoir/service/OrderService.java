@@ -1,6 +1,7 @@
 package hei.vaninah.devoir.service;
 
 import hei.vaninah.devoir.entity.*;
+import hei.vaninah.devoir.repository.DishOrderDAO;
 import hei.vaninah.devoir.repository.DishOrderStatusDAO;
 import hei.vaninah.devoir.repository.OrderDAO;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.List;
 public class OrderService {
     private final OrderDAO dao;
     private final DishOrderStatusDAO dishOrderStatusDAO;
+    private final DishOrderDAO dishOrderDAO;
 
     public Order findOrderByReference(String reference) {
         try {

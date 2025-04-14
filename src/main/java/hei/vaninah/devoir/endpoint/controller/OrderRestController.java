@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-public class OrderController {
+public class OrderRestController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
     private final DishOrderMapper dishOrderMapper;

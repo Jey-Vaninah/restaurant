@@ -116,8 +116,32 @@ public class Order {
         if (!CREATED.equals(actualStatus.getStatus())) {
             throw new RuntimeException("Only CREATE status can be updated");
         }
-        this.dishOrders.addAll(dishOrders);
-        return dishOrders;
+
+        dishOrders.stream().forEach(dishOrder -> {
+            if(!CREATED.equals(actualStatus.getStatus())) {
+                throw new RuntimeException("Only CREATE status can be updated");
+            }
+
+            DishOrder fromOrder = this.dishOrders
+                .stream()
+                .filter(dishO -> dishO.getId().equals(dishOrder.getId()))
+                .findFirst()
+                .orElse(null);
+
+            if(fromOrder == null){
+                this.dishOrders.add(dishOrder);
+                return;
+            }
+
+            if(!CREATED.equals(fromOrder.getActualStatus().getStatus())){
+                throw new RuntimeException("Only CREATE status can be updated");
+            }
+
+            fromOrder.setQuantity(dishOrder.getQuantity());
+        });
+
+        this.checkIngredientsAvailable();
+        return this.dishOrders;
     }
 
     public void checkIngredientsAvailable() {
@@ -140,8 +164,7 @@ public class Order {
         }
     }
 
-    public boolean isOrderConfirmed(){
-        List<OrderStatus> orderStatuses = this.getStatusHistories().stream().filter(status -> status.getStatus().equals(CONFIRMED)).toList();
-        return orderStatuses.size() > 0;
+    public boolean isConfirmed(){
+        return CONFIRMED.equals(this.getActualStatus().getStatus());
     }
 }
