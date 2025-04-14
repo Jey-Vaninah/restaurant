@@ -3,10 +3,7 @@ package hei.vaninah.devoir.endpoint.controller;
 import hei.vaninah.devoir.endpoint.mapper.DishOrderMapper;
 import hei.vaninah.devoir.endpoint.mapper.DishOrderStatusMapper;
 import hei.vaninah.devoir.endpoint.mapper.OrderMapper;
-import hei.vaninah.devoir.endpoint.rest.CreateDishOrder;
-import hei.vaninah.devoir.endpoint.rest.Order;
-import hei.vaninah.devoir.endpoint.rest.DishOrderStatus;
-import hei.vaninah.devoir.endpoint.rest.ProcessingTime;
+import hei.vaninah.devoir.endpoint.rest.*;
 import hei.vaninah.devoir.exception.ApiException;
 import hei.vaninah.devoir.service.OrderService;
 import lombok.AllArgsConstructor;
@@ -36,36 +33,38 @@ public class OrderRestController {
     }
 
     @PutMapping("/orders/{reference}/dishes")
-    public Order updateDishes(
+    public ResponseEntity<Object> updateDishes(
             @PathVariable("reference") String reference, @RequestBody List<CreateDishOrder> dishOrders) {
-        return orderMapper.toRest(
-            orderService.addDishOrder(
-                reference,
-                dishOrders.stream().map(dishOrder -> dishOrderMapper.createToDomain(reference, dishOrder)).toList()
+        try {
+            return ResponseEntity.ok().body(
+                    orderMapper.toRest(
+                    orderService.addDishOrder(
+                        reference,
+                        dishOrders.stream().map(dishOrder -> dishOrderMapper.createToDomain(reference, dishOrder)).toList()
+                    )
             )
-        );
-    }
-
-    @PutMapping("/orders/{reference}/dishes/{dishId}")
-    public ResponseEntity<Object> updateDishStatus(
-        @PathVariable("reference") String reference,
-        @PathVariable("dishId") String dishId,
-        @RequestBody DishOrderStatus updateRequest) {
-
-        try{
-            return ResponseEntity.ok().body(orderMapper.toRest(
-                orderService.updateDishOrderStatus(
-                    reference,
-                    dishOrderStatusMapper.toDomain(reference, dishId, updateRequest)
-                )
-            ));
-        } catch (ApiException error){
+            );
+        } catch (ApiException error) {
             return ResponseEntity.status(error.getStatus().value()).body(
                 Map.of(
                     "error", error.getMessage(),
                     "status", error.getStatus().value()
-                )
+                    )
             );
         }
+    }
+
+    @PutMapping("/orders/{reference}/dishes/{dishId}")
+    public Order updateDishStatus(
+        @PathVariable("reference") String reference,
+        @PathVariable("dishId") String dishId,
+        @RequestBody DishOrderStatus updateRequest) {
+
+        return orderMapper.toRest(
+            orderService.updateDishOrderStatus(
+                reference,
+                dishOrderStatusMapper.toDomain(reference, dishId, updateRequest)
+            )
+        );
     }
 }

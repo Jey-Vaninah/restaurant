@@ -27,7 +27,7 @@ public class Order {
     private ArrayList<DishOrder> dishOrders;
     private ArrayList<OrderStatus> statusHistories;
 
-    public void confirm(){
+    public void confirm() throws BadRequestException {
         this.checkIngredientsAvailable();
         this.dishOrders.forEach(di -> {
             di.updateStatus(CONFIRMED);
@@ -112,26 +112,26 @@ public class Order {
                 .orElse(new OrderStatus(randomUUID().toString(), this.getId(), CREATED, now(), now()));
     }
 
-    public void addDishOrders(List<DishOrder> dishOrders) {
+    public void addDishOrders(List<DishOrder> dishOrders) throws BadRequestException {
         OrderStatus actualStatus = this.getActualStatus();
         if (!CREATED.equals(actualStatus.getStatus())) {
             throw new BadRequestException("Only CREATE status can be updated");
         }
 
-        dishOrders.forEach(dishOrder -> {
+        for(DishOrder dishOrder : dishOrders){
             if(!CREATED.equals(actualStatus.getStatus())) {
                 throw new BadRequestException("Only CREATE status can be updated");
             }
 
             DishOrder fromOrder = this.dishOrders
-                .stream()
-                .filter(dishO -> dishO.getId().equals(dishOrder.getId()))
-                .findFirst()
-                .orElse(null);
+                    .stream()
+                    .filter(dishO -> dishO.getId().equals(dishOrder.getId()))
+                    .findFirst()
+                    .orElse(null);
 
             if(fromOrder == null){
                 this.dishOrders.add(dishOrder);
-                return;
+                continue;
             }
 
             if(!CREATED.equals(fromOrder.getActualStatus().getStatus())){
@@ -139,16 +139,16 @@ public class Order {
             }
 
             fromOrder.setQuantity(dishOrder.getQuantity());
-        });
+        }
 
         this.checkIngredientsAvailable();
     }
 
-    public void checkIngredientsAvailable() {
+    public void checkIngredientsAvailable() throws BadRequestException {
         for(DishOrder dishOrder : this.getDishOrders()) {
             List<Ingredient> ingredients = dishOrder.getDish().getIngredients();
             for (Ingredient ingredient : ingredients) {
-                float availableQuantity = ingredient.getAvailableQuantity(LocalDateTime.parse(ingredient.getId()));
+                float availableQuantity = ingredient.getAvailableQuantity(ingredient.getUpdateDatetime());
                 DishIngredient dishIngredient = dishOrder
                     .getDish()
                     .getDishIngredients()
@@ -158,7 +158,7 @@ public class Order {
                     .orElseThrow();
 
                 if (availableQuantity < dishIngredient.getRequiredQuantity()) {
-                    throw new RuntimeException("Ingredient " + ingredient.getId() + " is too low");
+                    throw new BadRequestException("Ingredient " + ingredient.getName() + " is too low");
                 }
             }
         }

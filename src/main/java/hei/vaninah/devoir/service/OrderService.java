@@ -1,6 +1,7 @@
 package hei.vaninah.devoir.service;
 
 import hei.vaninah.devoir.entity.*;
+import hei.vaninah.devoir.exception.BadRequestException;
 import hei.vaninah.devoir.repository.DishOrderDAO;
 import hei.vaninah.devoir.repository.DishOrderStatusDAO;
 import hei.vaninah.devoir.repository.OrderDAO;
@@ -25,7 +26,7 @@ public class OrderService {
         }
     }
 
-    public Order addDishOrder(String orderReference ,List<DishOrder> dishOrders){
+    public Order addDishOrder(String orderReference ,List<DishOrder> dishOrders) throws BadRequestException {
         try {
             Order order = dao.findByReference(orderReference);
             order.addDishOrders(dishOrders);
@@ -37,7 +38,7 @@ public class OrderService {
 
     public Order updateDishOrderStatus(String orderReference, DishOrderStatus dishOrderStatus) {
         try {
-            dishOrderStatusDAO.save(dishOrderStatus);
+            dishOrderStatusDAO.crupdate(dishOrderStatus);
             return dao.findByReference(orderReference);
         } catch (SQLException e) {
             throw new RuntimeException(e);
