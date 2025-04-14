@@ -1,26 +1,33 @@
 package hei.vaninah.devoir.service;
 
 import hei.vaninah.devoir.endpoint.rest.BestSales;
+import hei.vaninah.devoir.endpoint.rest.ProcessingTime;
+import hei.vaninah.devoir.endpoint.rest.ProcessingTimeType;
+import hei.vaninah.devoir.endpoint.rest.ProcessingValueType;
 import hei.vaninah.devoir.entity.Dish;
 import hei.vaninah.devoir.entity.DishIngredient;
+import hei.vaninah.devoir.entity.DishOrder;
+import hei.vaninah.devoir.entity.StatusHistory;
 import hei.vaninah.devoir.repository.*;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static hei.vaninah.devoir.entity.StatusHistory.COMPLETED;
+import static hei.vaninah.devoir.entity.StatusHistory.*;
 
 @Service
 @Data
 public class DishService {
     private final OrderDAO orderDAO;
     private final DishDAO dao;
+    private final DishOrderDAO dishOrderDAO;
     private final DishIngredientDAO dishIngredientDAO;
 
     public List<Dish> getAll(){
@@ -72,5 +79,64 @@ public class DishService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ProcessingTime getProcessingTime(String dishId, ProcessingValueType valueType, ProcessingTimeType timeType){
+        try {
+            List<Duration> durations = this.getDurationsByDishId(dishId);
+            if (durations.isEmpty()) {
+                return new ProcessingTime(0L, timeType);
+            }
+
+            long processingTime = this.computeAggregateDuration(durations, valueType);
+            long convertedProcessingTime = this.convertDuration(processingTime, timeType);
+
+            return new ProcessingTime(convertedProcessingTime, timeType);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Duration> getDurationsByDishId(String dishId) throws SQLException {
+        List<DishOrder> dishOrders = this.dishOrderDAO.findByDishId(dishId);
+
+        return dishOrders
+            .stream()
+            .filter(dishOrder -> {
+                StatusHistory status = dishOrder.getActualStatus().getStatus();
+                return !status.equals(CREATED) && !status.equals(IN_PREPARATION);
+            })
+            .map(dishOrder ->{
+                Duration duration = dishOrder.getStatusDuration(IN_PREPARATION, COMPLETED);
+                return duration.dividedBy(dishOrder.getQuantity());
+            })
+            .toList();
+    }
+
+
+    private long computeAggregateDuration(List<Duration> durations, ProcessingValueType type) {
+        return switch (type) {
+            case MINIMUM -> durations.stream()
+                .mapToLong(Duration::getSeconds)
+                .min()
+                .orElse(0);
+            case MAXIMUM -> durations.stream()
+                .mapToLong(Duration::getSeconds)
+                .max()
+                .orElse(0);
+            case AVERAGE -> (long) durations.stream()
+                .mapToLong(Duration::getSeconds)
+                .average()
+                .orElse(0);
+        };
+    }
+
+    private long convertDuration(long durationTime, ProcessingTimeType unit) {
+        Duration duration = Duration.ofSeconds(durationTime);
+        return switch (unit) {
+            case SECONDS -> duration.getSeconds();
+            case MINUTES -> duration.toMinutes();
+            case HOURS  -> duration.toHours();
+        };
     }
 }

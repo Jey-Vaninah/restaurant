@@ -2,9 +2,7 @@ package hei.vaninah.devoir.endpoint.controller;
 
 import hei.vaninah.devoir.endpoint.mapper.DishIngredientMapper;
 import hei.vaninah.devoir.endpoint.mapper.DishMapper;
-import hei.vaninah.devoir.endpoint.rest.BestSales;
-import hei.vaninah.devoir.endpoint.rest.DishIngredient;
-import hei.vaninah.devoir.endpoint.rest.Dish;
+import hei.vaninah.devoir.endpoint.rest.*;
 import hei.vaninah.devoir.service.DishService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,4 +34,14 @@ public class DishRestController {
     public List<BestSales> getBestSales(@RequestParam Integer limit, @RequestParam LocalDateTime from, @RequestParam LocalDateTime to) {
         return dishService.findBestSales(limit, from, to);
     }
+
+    @GetMapping("/dishes/{id}/processingTime")
+    public ProcessingTime getProcessingTimes(
+        @PathVariable("id") String id,
+        @RequestParam(required = false, defaultValue = "AVERAGE") ProcessingValueType valueType,
+        @RequestParam(required = false, defaultValue = "SECONDS") ProcessingTimeType timeType
+    ) {
+        return dishService.getProcessingTime(id, valueType, timeType);
+    }
+
 }

@@ -3,6 +3,8 @@ package hei.vaninah.devoir.entity;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -51,5 +53,21 @@ public class DishOrder {
 
     public String getOrder() {
         return this.orderId;
+    }
+
+    public Duration getStatusDuration(StatusHistory statusFrom, StatusHistory statusTo) {
+        LocalDateTime statusFromTime = this.dishOrderStatus.stream()
+                .filter(status -> status.getStatus().equals(statusFrom))
+                .map(DishOrderStatus::getCreatedAt)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Status " + statusFrom + " not found"));
+
+        LocalDateTime statusToTime = this.dishOrderStatus.stream()
+                .filter(status -> status.getStatus().equals(statusTo))
+                .map(DishOrderStatus::getCreatedAt)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Status " + statusTo + " not found"));
+
+        return Duration.between(statusFromTime, statusToTime);
     }
 }

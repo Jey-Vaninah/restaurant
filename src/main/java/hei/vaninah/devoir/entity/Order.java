@@ -1,5 +1,6 @@
 package hei.vaninah.devoir.entity;
 
+import hei.vaninah.devoir.exception.BadRequestException;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -111,15 +112,15 @@ public class Order {
                 .orElse(new OrderStatus(randomUUID().toString(), this.getId(), CREATED, now(), now()));
     }
 
-    public List<DishOrder> addDishOrders(List<DishOrder> dishOrders) {
+    public void addDishOrders(List<DishOrder> dishOrders) {
         OrderStatus actualStatus = this.getActualStatus();
         if (!CREATED.equals(actualStatus.getStatus())) {
-            throw new RuntimeException("Only CREATE status can be updated");
+            throw new BadRequestException("Only CREATE status can be updated");
         }
 
-        dishOrders.stream().forEach(dishOrder -> {
+        dishOrders.forEach(dishOrder -> {
             if(!CREATED.equals(actualStatus.getStatus())) {
-                throw new RuntimeException("Only CREATE status can be updated");
+                throw new BadRequestException("Only CREATE status can be updated");
             }
 
             DishOrder fromOrder = this.dishOrders
@@ -134,14 +135,13 @@ public class Order {
             }
 
             if(!CREATED.equals(fromOrder.getActualStatus().getStatus())){
-                throw new RuntimeException("Only CREATE status can be updated");
+                throw new BadRequestException("Only CREATE status can be updated");
             }
 
             fromOrder.setQuantity(dishOrder.getQuantity());
         });
 
         this.checkIngredientsAvailable();
-        return this.dishOrders;
     }
 
     public void checkIngredientsAvailable() {
@@ -150,12 +150,12 @@ public class Order {
             for (Ingredient ingredient : ingredients) {
                 float availableQuantity = ingredient.getAvailableQuantity(LocalDateTime.parse(ingredient.getId()));
                 DishIngredient dishIngredient = dishOrder
-                        .getDish()
-                        .getDishIngredients()
-                        .stream()
-                        .filter(di -> di.getIdIngredient().equals(ingredient.getId()))
-                        .findFirst()
-                        .orElseThrow();
+                    .getDish()
+                    .getDishIngredients()
+                    .stream()
+                    .filter(di -> di.getIdIngredient().equals(ingredient.getId()))
+                    .findFirst()
+                    .orElseThrow();
 
                 if (availableQuantity < dishIngredient.getRequiredQuantity()) {
                     throw new RuntimeException("Ingredient " + ingredient.getId() + " is too low");

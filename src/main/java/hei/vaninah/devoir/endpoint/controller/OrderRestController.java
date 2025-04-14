@@ -6,12 +6,15 @@ import hei.vaninah.devoir.endpoint.mapper.OrderMapper;
 import hei.vaninah.devoir.endpoint.rest.CreateDishOrder;
 import hei.vaninah.devoir.endpoint.rest.Order;
 import hei.vaninah.devoir.endpoint.rest.DishOrderStatus;
+import hei.vaninah.devoir.endpoint.rest.ProcessingTime;
+import hei.vaninah.devoir.exception.ApiException;
 import hei.vaninah.devoir.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -44,16 +47,25 @@ public class OrderRestController {
     }
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")
-    public Order updateDishStatus(
+    public ResponseEntity<Object> updateDishStatus(
         @PathVariable("reference") String reference,
         @PathVariable("dishId") String dishId,
         @RequestBody DishOrderStatus updateRequest) {
 
-        return orderMapper.toRest(
-            orderService.updateDishOrderStatus(
-                reference,
-                dishOrderStatusMapper.toDomain(reference, dishId, updateRequest)
-            )
-        );
+        try{
+            return ResponseEntity.ok().body(orderMapper.toRest(
+                orderService.updateDishOrderStatus(
+                    reference,
+                    dishOrderStatusMapper.toDomain(reference, dishId, updateRequest)
+                )
+            ));
+        } catch (ApiException error){
+            return ResponseEntity.status(error.getStatus().value()).body(
+                Map.of(
+                    "error", error.getMessage(),
+                    "status", error.getStatus().value()
+                )
+            );
+        }
     }
 }

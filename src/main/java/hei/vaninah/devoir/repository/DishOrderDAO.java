@@ -146,4 +146,19 @@ public class DishOrderDAO implements RestaurantManagementDAO<DishOrder> {
 
         return dishOrders;
     }
+
+    public List<DishOrder> findByDishId(String dishId) throws SQLException {
+        List<DishOrder> dishOrders = new ArrayList<>();
+        String query = """
+            select * from dish_order where dish_order.id_dish = ?;
+        """;
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dishId);
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()){
+            dishOrders.add(resultSetToDishOrder(rs));
+        }
+        return dishOrders;
+    }
 }
